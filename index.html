@@ -135,7 +135,16 @@
     // ============================================
     // KONFIGURASI — Ganti dengan API key kamu
     // ============================================
-    const API_KEY = "MASUKKAN_API_KEY_KAMU_DI_SINI";
+    const GEMINI_API_KEY = "jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Jalankan script
+        env:
+          API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          echo "AQ.Ab8RN6LQmubV00YdFdfTjr09oCelmG60cdt9qtOrzWtanMqeIg"
+          node script.js";
 
     const STORAGE_KEY = "chatbot_riwayat";
     const SUARA_KEY = "chatbot_suara";
