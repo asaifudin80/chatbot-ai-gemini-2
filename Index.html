@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot AI</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #1e1e2e;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .chat-box {
+      width: 100%;
+      max-width: 500px;
+      background: #2a2a3e;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.4);
+      display: flex;
+      flex-direction: column;
+      height: 90vh;
+      max-height: 700px;
+    }
+    .header {
+      background: #6c5ce7;
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header .title { font-size: 18px; }
+    .header .controls { display: flex; gap: 8px; }
+    .icon-btn {
+      background: rgba(255,255,255,.15);
+      border: none;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background .2s;
+    }
+    .icon-btn:hover { background: rgba(255,255,255,.3); }
+    .icon-btn.active { background: #00b894; }
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .msg {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      animation: muncul .2s ease;
+    }
+    @keyframes muncul {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .user {
+      align-self: flex-end;
+      background: #6c5ce7;
+      color: white;
+      border-bottom-right-radius: 2px;
+    }
+    .bot {
+      align-self: flex-start;
+      background: #3d3d5c;
+      color: #eee;
+      border-bottom-left-radius: 2px;
+    }
+    .input-area {
+      display: flex;
+      padding: 10px;
+      gap: 8px;
+      background: #232336;
+    }
+    input {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #3d3d5c;
+      color: white;
+      outline: none;
+      font-size: 15px;
+    }
+    input:focus { background: #454568; }
+    button.send {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #6c5ce7;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 15px;
+    }
+    button.send:hover { background: #5a4bd1; }
+    button.send:disabled { opacity: .5; cursor: not-allowed; }
+    #messages::-webkit-scrollbar { width: 6px; }
+    #messages::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div class="chat-box">
+    <div class="header">
+      <span class="title">🤖 Chatbot AI</span>
+      <div class="controls">
+        <button class="icon-btn" id="btnSuara" title="Mode suara">🔊</button>
+        <button class="icon-btn" id="btnHapus" title="Hapus riwayat">🗑️</button>
+      </div>
+    </div>
+    <div id="messages"></div>
+    <div class="input-area">
+      <input id="input" placeholder="Tulis pesan..." autofocus>
+      <button class="send" id="btnKirim" onclick="kirim()">Kirim</button>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // KONFIGURASI — Ganti dengan API key kamu
+    // ============================================
+    const API_KEY = "MASUKKAN_API_KEY_KAMU_DI_SINI";
+
+    const STORAGE_KEY = "chatbot_riwayat";
+    const SUARA_KEY = "chatbot_suara";
+
+    // ============================================
+    // RIWAYAT CHAT (localStorage)
+    // ============================================
+    function muatRiwayat() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    }
+
+    function simpanRiwayat(user, bot) {
+      const riwayat = muatRiwayat();
+      riwayat.push({ user, bot, waktu: Date.now() });
+      if (riwayat.length > 50) riwayat.shift();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(riwayat));
+    }
+
+    function tampilkanSemuaRiwayat() {
+      const riwayat = muatRiwayat();
+      const container = document.getElementById("messages");
+      container.innerHTML = "";
+
+      if (riwayat.length === 0) {
+        tampilkan("Halo! Ada yang bisa saya bantu?", "bot");
+        return;
+      }
+
+      riwayat.forEach(pesan => {
+        tampilkan(pesan.user, "user");
+        tampilkan(pesan.bot, "bot");
+      });
+    }
+
+    function hapusRiwayat() {
+      if (!confirm("Hapus semua riwayat chat?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      tampilkanSemuaRiwayat();
+    }
+
+    // ============================================
+    // MODE SUARA (Text-to-Speech)
+    // ============================================
+    let suaraAktif = localStorage.getItem(SUARA_KEY) === "true";
+
+    function updateTombolSuara() {
+      const btn = document.getElementById("btnSuara");
+      btn.classList.toggle("active", suaraAktif);
+      btn.textContent = suaraAktif ? "🔊" : "🔇";
+    }
+
+    function bicara(teks) {
+      if (!suaraAktif || !window.speechSynthesis) return;
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(teks);
+      u.lang = "id-ID";
+      u.rate = 1;
+      u.pitch = 1;
+      speechSynthesis.speak(u);
+    }
+
+    document.getElementById("btnSuara").addEventListener("click", () => {
+      suaraAktif = !suaraAktif;
+      localStorage.setItem(SUARA_KEY, suaraAktif);
+      updateTombolSuara();
+      if (!suaraAktif) speechSynthesis.cancel();
+    });
+
+    // ============================================
+    // KIRIM PESAN KE GEMINI
+    // ============================================
+    async function kirim() {
+      const input = document.getElementById("input");
+      const btn = document.getElementById("btnKirim");
+      const pesan = input.value.trim();
+      if (!pesan) return;
+
+      tampilkan(pesan, "user");
+      input.value = "";
+      btn.disabled = true;
+      const loading = tampilkan("Mengetik...", "bot");
+
+      try {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${API_KEY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: pesan }] }]
+            })
+          }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          loading.textContent = "⚠️ " + (data.error?.message || "Terjadi kesalahan.");
+          return;
+        }
+
+        const balasan = data.candidates[0].content.parts[0].text;
+        loading.textContent = balasan;
+        simpanRiwayat(pesan, balasan);
+        bicara(balasan);
+
+      } catch (err) {
+        loading.textContent = "❌ Gagal terhubung. Cek internet & API key.";
+      } finally {
+        btn.disabled = false;
+        input.focus();
+      }
+    }
+
+    function tampilkan(teks, siapa) {
+      const div = document.createElement("div");
+      div.className = "msg " + siapa;
+      div.textContent = teks;
+      document.getElementById("messages").appendChild(div);
+      document.getElementById("messages").scrollTop = 999999;
+      return div;
+    }
+
+    // ============================================
+    // INISIALISASI
+    // ============================================
+    document.getElementById("btnHapus").addEventListener("click", hapusRiwayat);
+
+    document.getElementById("input").addEventListener("keydown", e => {
+      if (e.key === "Enter") kirim();
+    });
+
+    updateTombolSuara();
+    tampilkanSemuaRiwayat();
+  </script>
+</body>
+  </html>
