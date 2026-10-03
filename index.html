@@ -2,102 +2,141 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FIX INPUT</title>
+<title>As AI Pro - FINAL</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}
-body{height:100dvh;display:flex;flex-direction:column;background:#0f0f0f}
-#top{padding:12px;background:#202020;color:#fff;display:flex;gap:10px;align-items:center;border-bottom:1px solid #333}
-#top button{width:36px;height:36px;border-radius:50%;border:1px solid #444;background:#2a2a2a;color:#fff}
-#chatBox{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
-.msg{max-width:80%;padding:10px 14px;border-radius:16px;font-size:14px}
-.msg.user{align-self:flex-end;background:#3b82f6;color:#fff}
-.msg.bot{align-self:flex-start;background:#2a2a2a;color:#fff;border:1px solid #333}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui}
+body{height:100dvh;display:flex;background:#0f0f0f;overflow:hidden}
+.sidebar{width:280px;background:#171717;border-right:1px solid #2a2a2a;display:flex;flex-direction:column;transition:.3s;z-index:30}
+.sidebar.close{margin-left:-280px}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;background:#1a1a1a;height:100dvh}
+.top{padding:12px;background:#202020;color:#fff;display:flex;gap:10px;align-items:center;border-bottom:1px solid #333}
+.icon{width:36px;height:36px;border-radius:50%;border:1px solid #444;background:#2a2a2a;color:#fff;cursor:pointer}
+.chatBox{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:80%;padding:11px 14px;border-radius:16px;font-size:14px;line-height:1.4}
+.msg.user{align-self:flex-end;background:#3b82f6;color:#fff;border-bottom-right-radius:4px}
+.msg.bot{align-self:flex-start;background:#2a2a2a;color:#eee;border:1px solid #333}
 .msg img{max-width:180px;border-radius:8px;margin-top:6px;display:block}
-
-/* INI INPUT YANG KEMARIN HILANG - AKU PAKSA MUNCUL DI BAWAH */
-#inputBar{
-  display:flex!important;
-  gap:8px;
-  padding:12px;
-  background:#202020;
-  border-top:2px solid red; /* biar kelihatan, nanti hapus aja */
-  position:sticky;
-  bottom:0;
-  left:0;
-  right:0;
-  z-index:99;
-}
-#userIn{
-  flex:1;
-  padding:14px 18px;
-  border-radius:24px;
-  border:1px solid #555;
-  background:#111;
-  color:#fff;
-  outline:none;
-  font-size:16px; /* biar gak zoom di iPhone */
-}
-#sendBtn{width:48px;height:48px;border-radius:50%;border:none;background:#3b82f6;color:#fff;font-size:18px;font-weight:bold}
-
-/* modal api biar gampang */
-#apiBox{display:flex;gap:8px;padding:10px;background:#171717;border-bottom:1px solid #333}
-#apiBox input{flex:1;padding:10px;border-radius:8px;border:1px solid #333;background:#2a2a2a;color:#fff}
+.preview{display:none;padding:8px 12px;background:#111;gap:10px;align-items:center;color:#ccc;border-top:1px solid #222}
+.preview.on{display:flex}
+#inputBar{display:flex!important;gap:8px;padding:10px;background:#202020;border-top:1px solid #333;position:sticky;bottom:0;z-index:20}
+#userIn{flex:1;padding:13px 16px;border-radius:24px;border:1px solid #444;background:#111;color:#fff;outline:none;font-size:16px}
+#sendBtn{width:46px;height:46px;border-radius:50%;border:none;background:#3b82f6;color:#fff;font-weight:bold;font-size:18px}
+.list{flex:1;overflow-y:auto;padding:8px}
+.item{padding:11px;background:#1f1f1f;margin-bottom:6px;border-radius:10px;color:#ccc;display:flex;justify-content:space-between;align-items:center;cursor:pointer;position:relative}
+.item.active{border:1px solid #3b82f6;color:#fff}
+.dot{border:none;background:none;color:#888;font-size:18px;padding:0 6px}
+.menu{display:none;position:absolute;right:8px;top:36px;background:#2a2a2a;border:1px solid #333;border-radius:8px;z-index:5}
+.menu button{display:block;width:100%;padding:8px 12px;background:none;border:none;color:#fff;text-align:left;font-size:13px}
+.menu.on{display:block}
+.sideFoot{padding:12px;border-top:1px solid #2a2a2a}
+.act{width:100%;padding:10px;border-radius:10px;border:1px solid #333;background:#1f1f1f;color:#fff;margin-top:8px;text-align:left;cursor:pointer}
+.act.out{color:#ff6b6b}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;justify-content:center;align-items:center;z-index:99}
+.modal.on{display:flex}
+.box{background:#1e1e1e;width:90%;max-width:380px;padding:20px;border-radius:16px;border:1px solid #333;color:#fff}
+.box input{width:100%;padding:11px;border-radius:8px;border:1px solid #333;background:#2a2a2a;color:#fff;margin:6px 0 10px}
+@media(max-width:768px){.sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);margin:0!important}.sidebar.open{transform:translateX(0)}.sidebar.close{margin:0;transform:translateX(-100%)}}
 </style>
 </head>
 <body>
 
-<div id="top">
-  <button onclick="location.reload()">☰</button>
-  <b>As AI - Input Fix</b>
-  <button id="clearBtn" style="margin-left:auto">🗑️</button>
+<aside id="sidebar" class="sidebar">
+  <div style="padding:16px;display:flex;justify-content:space-between;color:#fff;border-bottom:1px solid #2a2a2a"><b>🤖 As AI</b><button id="closeSide" class="icon">✕</button></div>
+  <button id="newChat" style="margin:12px;padding:12px;background:#3b82f6;color:#fff;border:0;border-radius:10px;font-weight:700;cursor:pointer">+ Chat Baru</button>
+  <div id="chatList" class="list"></div>
+  <div class="sideFoot">
+    <div id="userBox" style="display:none;background:#1f1f1f;padding:10px;border-radius:10px;color:#fff;font-size:12px;margin-bottom:6px">👤 <span id="uEmail"></span></div>
+    <button id="btnLogin" class="act">🔑 Masuk Akun (Email)</button>
+    <button id="btnLogout" class="act out" style="display:none">🚪 Keluar Akun</button>
+    <button id="btnApi" class="act">⚙️ Pengaturan API Key</button>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="top">
+    <button id="openSide" class="icon">☰</button>
+    <div style="flex:1"><b id="title">Chat Baru</b><br><small id="status" style="color:#888">Belum login</small></div>
+    <button id="clearBtn" class="icon">🗑️</button>
+  </div>
+  <div id="chatBox" class="chatBox"></div>
+  <div id="filePrev" class="preview"></div>
+  <form id="inputBar"><label for="fileIn" style="width:44px;height:44px;background:#2a2a2a;border:1px solid #444;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer">📎</label><input type="file" id="fileIn" hidden accept="image/*,video/*,.pdf,.txt"><input type="text" id="userIn" placeholder="Ketik pesan..." autocomplete="off"><button id="sendBtn">➤</button></form>
 </div>
 
-<div id="apiBox">
-  <input type="password" id="apiKey" placeholder="Paste API Key Gemini (AIza...)">
-  <button id="saveKey" style="padding:10px 14px;border-radius:8px;border:none;background:#3b82f6;color:#fff;font-weight:bold">Simpan</button>
-</div>
-
-<div id="chatBox"></div>
-
-<!-- INPUT BAR - INI YANG TADI HILANG -->
-<form id="inputBar">
-  <input type="text" id="userIn" placeholder="Ketik pesan disini... (pasti muncul sekarang)" autocomplete="off" required>
-  <button type="submit" id="sendBtn">➤</button>
-</form>
+<div id="loginModal" class="modal"><div class="box"><h3>🔑 Masuk</h3><p style="color:#aaa;font-size:13px;margin:8px 0">Chat kesimpan per email</p><input id="loginEmail" type="email" placeholder="kamu@gmail.com"><input id="loginName" type="text" placeholder="Nama"><div style="display:flex;gap:10px"><button id="doLogin" style="flex:1;padding:10px;border-radius:8px;border:none;background:#3b82f6;color:#fff;font-weight:700">Masuk</button><button id="closeLogin" style="flex:1;padding:10px;border-radius:8px;border:1px solid #333;background:#2a2a2a;color:#fff">Batal</button></div></div></div>
+<div id="apiModal" class="modal"><div class="box"><h3>⚙️ API Key</h3><input id="key1" type="password" placeholder="Key 1 WAJIB (AIza...)"><input id="key2" type="password" placeholder="Key 2 opsional"><input id="key3" type="password" placeholder="Key 3 opsional"><div style="display:flex;gap:10px"><button id="saveApi" style="flex:1;padding:10px;border-radius:8px;border:none;background:#3b82f6;color:#fff;font-weight:700">Simpan</button><button id="closeApi" style="flex:1;padding:10px;border-radius:8px;border:1px solid #333;background:#2a2a2a;color:#fff">Tutup</button></div></div></div>
 
 <script>
-const chatBox=document.getElementById('chatBox');
-const userIn=document.getElementById('userIn');
-const apiKeyInput=document.getElementById('apiKey');
-apiKeyInput.value=localStorage.getItem('gemini_key')||'';
-let chats=JSON.parse(localStorage.getItem('chats')||'[]');
-chats.forEach(m=>add(m.t,m.s,false));
-function save(){localStorage.setItem('chats',JSON.stringify(chats));}
-function add(t,s,sv=true){
-  const d=document.createElement('div');d.className='msg '+s;d.textContent=t;chatBox.appendChild(d);chatBox.scrollTop=99999;
-  if(sv){chats.push({t,s}); save();} return d;
+const $=id=>document.getElementById(id);
+let user=JSON.parse(localStorage.getItem('user_login')||'null');
+let allChats=JSON.parse(localStorage.getItem('all_chats')||'{}');
+let cur=localStorage.getItem('cur_id')||Date.now().toString();
+if(!allChats[cur]) allChats[cur]=[];
+let keys=JSON.parse(localStorage.getItem('gemini_keys')||'[]');
+let file=null, kIdx=0;
+
+function refreshUser(){if(user){$('userBox').style.display='block';$('uEmail').innerText=user.email;$('btnLogin').style.display='none';$('btnLogout').style.display='block';$('status').innerText=user.email}else{$('userBox').style.display='none';$('btnLogin').style.display='block';$('btnLogout').style.display='none';$('status').innerText='Belum login';}} refreshUser();
+
+$('openSide').onclick=()=>{$('sidebar').classList.add('open');$('sidebar').classList.remove('close')};
+$('closeSide').onclick=()=>{$('sidebar').classList.remove('open'); if(window.innerWidth<=768) $('sidebar').classList.add('close')};
+
+$('btnLogin').onclick=()=>$('loginModal').classList.add('on');
+$('closeLogin').onclick=()=>$('loginModal').classList.remove('on');
+$('doLogin').onclick=()=>{const e=$('loginEmail').value.trim(), n=$('loginName').value.trim()||e.split('@')[0]; if(!e.includes('@')) return alert('Email salah'); user={email:e,name:n}; localStorage.setItem('user_login',JSON.stringify(user)); $('loginModal').classList.remove('on'); refreshUser();};
+$('btnLogout').onclick=()=>{if(confirm('Keluar akun?')){localStorage.removeItem('user_login'); user=null; refreshUser();}};
+
+$('btnApi').onclick=()=>{ $('apiModal').classList.add('on'); $('key1').value=keys[0]||''; $('key2').value=keys[1]||''; $('key3').value=keys[2]||''; };
+$('closeApi').onclick=()=>$('apiModal').classList.remove('on');
+$('saveApi').onclick=()=>{const k1=$('key1').value.trim(); if(!k1) return alert('Key 1 wajib'); keys=[k1,$('key2').value.trim(),$('key3').value.trim()].filter(x=>x); localStorage.setItem('gemini_keys',JSON.stringify(keys)); $('apiModal').classList.remove('on');};
+if(keys.length==0) $('apiModal').classList.add('on');
+
+function save(){localStorage.setItem('all_chats',JSON.stringify(allChats)); localStorage.setItem('cur_id',cur); render();}
+function render(){
+  const list=$('chatList'); list.innerHTML='';
+  Object.keys(allChats).reverse().forEach(id=>{
+    const f=allChats[id][0]?.text||'Chat Baru';
+    const d=document.createElement('div'); d.className='item'+(id==cur?' active':'');
+    d.innerHTML=`<span style="flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${f.slice(0,22)}</span><button class="dot">⋮</button><div class="menu"><button data-a="ren">✏️ Rename</button><button data-a="del">🗑️ Hapus</button></div>`;
+    const dot=d.querySelector('.dot'), menu=d.querySelector('.menu');
+    dot.onclick=e=>{e.stopPropagation(); document.querySelectorAll('.menu').forEach(m=>{if(m!=menu)m.classList.remove('on')}); menu.classList.toggle('on');};
+    menu.querySelector('[data-a="del"]').onclick=e=>{e.stopPropagation(); if(confirm('Hapus?')){delete allChats[id]; if(id==cur){cur=Date.now().toString(); allChats[cur]=[];} save(); load();}};
+    menu.querySelector('[data-a="ren"]').onclick=e=>{e.stopPropagation(); const nn=prompt('Nama baru',f); if(nn){ if(allChats[id][0]) allChats[id][0].text=nn; else allChats[id].push({text:nn,sender:'user'}); save();} menu.classList.remove('on');};
+    d.onclick=()=>{cur=id; load(); if(window.innerWidth<=768) $('sidebar').classList.remove('open');};
+    list.appendChild(d);
+  });
 }
-document.getElementById('saveKey').onclick=()=>{
-  const k=apiKeyInput.value.trim(); if(!k) return alert('Isi API Key dulu');
-  localStorage.setItem('gemini_key',k); alert('Key disimpan!');
+function load(){$('chatBox').innerHTML=''; (allChats[cur]||[]).forEach(m=>add(m.text,m.sender,m.file,false)); $('title').innerText=(allChats[cur][0]?.text||'Chat Baru').slice(0,20); save();}
+function add(t,s,f,sv=true){const d=document.createElement('div'); d.className='msg '+s; d.textContent=t; if(f) d.innerHTML+=`<img src="${f}">`; $('chatBox').appendChild(d); $('chatBox').scrollTop=99999; if(sv){allChats[cur].push({text:t,sender:s,file:f}); save();} return d;}
+render(); load();
+$('newChat').onclick=()=>{cur=Date.now().toString(); allChats[cur]=[]; $('chatBox').innerHTML=''; $('title').innerText='Chat Baru'; save();};
+$('clearBtn').onclick=()=>{if(confirm('Hapus chat ini?')){allChats[cur]=[]; $('chatBox').innerHTML=''; save();}};
+
+$('fileIn').onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const b64=await new Promise(r=>{const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(f);});
+  file={b64:b64.split(',')[1], mime:f.type, prev:b64};
+  $('filePrev').innerHTML=`<img src="${b64}" style="width:44px;border-radius:6px"><span style="font-size:12px">${f.name}</span><button onclick="file=null;this.parentElement.classList.remove('on')" style="margin-left:auto;background:#ff4444;border:none;color:#fff;width:22px;height:22px;border-radius:50%">✕</button>`;
+  $('filePrev').classList.add('on');
 };
-document.getElementById('clearBtn').onclick=()=>{if(confirm('Hapus chat?')){chats=[];localStorage.removeItem('chats');chatBox.innerHTML='';}};
-document.getElementById('inputBar').addEventListener('submit', async e=>{
+
+$('inputBar').addEventListener('submit', async e=>{
   e.preventDefault();
-  const key=localStorage.getItem('gemini_key'); if(!key) return alert('Isi API Key di atas dulu!');
-  const txt=userIn.value.trim(); if(!txt) return;
-  add(txt,'user',true); userIn.value='';
-  const load=add('...','bot',false);
-  try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:txt}]}]})
-    });
-    const data=await res.json(); load.remove();
-    if(data.candidates) add(data.candidates[0].content.parts[0].text,'bot',true);
-    else add('Error: '+JSON.stringify(data).slice(0,200),'bot',true);
-  }catch(err){ load.remove(); add('Error koneksi','bot',true); }
+  if(!user) return $('loginModal').classList.add('on');
+  const txt=$('userIn').value.trim(); if(!txt &&!file) return;
+  const curFile=file; add(txt||'📎 file','user',curFile?.prev,true); $('userIn').value=''; $('filePrev').classList.remove('on'); file=null;
+  const ld=add('...','bot',null,false);
+  const parts=[]; if(txt) parts.push({text:txt}); if(curFile) parts.push({inlineData:{mimeType:curFile.mime,data:curFile.b64}});
+  for(let i=0;i<keys.length;i++){
+    try{
+      const k=keys[kIdx%keys.length];
+      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${k}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
+      const d=await r.json(); ld.remove();
+      if(d.candidates){add(d.candidates[0].content.parts[0].text,'bot',null,true); return;} else kIdx++;
+    }catch{kIdx++}
+  }
+  ld.remove(); add('❌ Key limit, tambah di ⚙️','bot',null,true);
 });
+document.addEventListener('click',()=>document.querySelectorAll('.menu').forEach(m=>m.classList.remove('on')));
 </script>
 </body>
-</html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               </html>
