@@ -1,208 +1,203 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>As AI Pro</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>As AI Pro - FINAL FIX</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
 body{background:#0f0f0f;height:100vh;overflow:hidden}
-.app{display:flex;height:100vh;width:100vw}
-/* SIDEBAR FIX */
-.sidebar{width:280px;min-width:280px;background:#171717;border-right:1px solid #2a2a2a;display:flex;flex-direction:column;transform:translateX(0);transition:0.3s}
-.sidebar.hidden{margin-left:-280px}
-.sidebar-header{display:flex;justify-content:space-between;align-items:center;padding:16px;color:#fff;border-bottom:1px solid #2a2a2a}
-.new-chat-btn{margin:12px;padding:11px;background:#3b82f6;color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:700}
-#chat-list-sidebar{flex:1;overflow-y:auto;padding:8px}
-.chat-item{padding:10px 12px;background:#1f1f1f;margin-bottom:6px;border-radius:8px;color:#ccc;font-size:13px;cursor:pointer;display:flex;justify-content:space-between}
+.app{display:flex;height:100vh}
+.sidebar{width:280px;background:#171717;border-right:1px solid #2a2a2a;display:flex;flex-direction:column;transition:.3s;z-index:20}
+.sidebar-header{padding:16px;display:flex;justify-content:space-between;align-items:center;color:#fff;border-bottom:1px solid #2a2a2a}
+.new-btn{margin:12px;padding:12px;background:#3b82f6;color:#fff;border:0;border-radius:10px;font-weight:700;cursor:pointer}
+.chat-list{flex:1;overflow-y:auto;padding:8px}
+.chat-item{padding:12px;background:#1f1f1f;margin-bottom:6px;border-radius:10px;color:#ccc;display:flex;justify-content:space-between;align-items:center;position:relative;cursor:pointer}
 .chat-item.active{border:1px solid #3b82f6;color:#fff}
-.sidebar-footer{padding:12px;border-top:1px solid #2a2a2a}
-.user-box{display:flex;align-items:center;gap:10px;background:#1f1f1f;padding:10px;border-radius:10px;color:#fff;margin-bottom:8px}
-.user-box.avatar{width:32px;height:32px;background:#3b82f6;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.side-btn{width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid #333;background:#1f1f1f;color:#fff;cursor:pointer;text-align:left}
-.side-btn.logout{color:#ff6b6b;border-color:#ff444433}
-/* MAIN CHAT FIX */
-.chat-container{flex:1;display:flex;flex-direction:column;min-width:0;background:#1a1a1a}
-.chat-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#202020;border-bottom:1px solid #2a2a2a;color:#fff}
-#open-sidebar,#clear-btn{background:#2a2a2a;border:1px solid #333;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px;flex-shrink:0}
+.dot-btn{background:none;border:none;color:#888;font-size:18px;cursor:pointer;padding:0 6px}
+.dot-menu{display:none;position:absolute;right:10px;top:38px;background:#2a2a2a;border:1px solid #333;border-radius:8px;z-index:5;overflow:hidden}
+.dot-menu button{display:block;width:100%;padding:8px 12px;background:none;border:none;color:#fff;text-align:left;font-size:13px;cursor:pointer}
+.dot-menu button:hover{background:#333}
+.dot-menu.open{display:block}
+.side-footer{padding:12px;border-top:1px solid #2a2a2a}
+.side-action{width:100%;padding:11px;border-radius:10px;border:1px solid #333;background:#1f1f1f;color:#fff;cursor:pointer;margin-top:8px;text-align:left}
+.side-action.logout{color:#ff6b6b;border-color:#ff4444}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;background:#1a1a1a}
+.main-header{padding:12px 16px;background:#202020;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;gap:12px;color:#fff}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid #333;background:#2a2a2a;color:#fff;cursor:pointer;flex-shrink:0}
 .chat-box{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
-.message{max-width:80%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word}
-.message.user{align-self:flex-end;background:#3b82f6;color:#fff;border-bottom-right-radius:4px}
-.message.bot{align-self:flex-start;background:#2a2a2a;color:#e5e5e5;border:1px solid #333}
-.message img{max-width:200px;border-radius:10px;margin-top:8px;display:block}
-/* INPUT FIX - INI YANG HILANG KEMARIN */
-.chat-input{display:flex!important;gap:10px;padding:12px 14px;background:#202020;border-top:1px solid #2a2a2a;align-items:center;position:sticky;bottom:0}
-.chat-input input[type=text]{flex:1;padding:12px 16px;border-radius:24px;border:1px solid #333;background:#2a2a2a;color:#fff;outline:none;min-width:0}
-.file-btn{width:44px;height:44px;background:#2a2a2a;border:1px solid #333;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-.file-preview{display:none;padding:10px 16px;background:#171717;border-top:1px solid #2a2a2a;gap:10px;align-items:center;color:#ccc}
-.file-preview.active{display:flex}
-#send-btn{width:44px;height:44px;border-radius:50%;border:none;background:#3b82f6;color:#fff;font-weight:bold;cursor:pointer;flex-shrink:0}
-/* MODAL */
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);justify-content:center;align-items:center;z-index:999}
-.modal.open{display:flex}
-.modal-content{background:#1e1e1e;width:90%;max-width:400px;padding:22px;border-radius:16px;border:1px solid #333;color:#fff}
-.modal-content input,.modal-content select{width:100%;padding:11px;border-radius:8px;background:#2a2a2a;border:1px solid #333;color:#fff;margin:6px 0 12px}
-.modal-actions{display:flex;gap:10px;margin-top:12px}
-.modal-actions button{flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-weight:bold}
-#save-api-btn,#login-submit-btn{background:#3b82f6;color:#fff}
-.secondary{background:#2a2a2a!important;color:#ccc!important;border:1px solid #333!important}
-@media(max-width:768px){
-.sidebar{position:fixed;left:0;top:0;bottom:0;z-index:50;transform:translateX(-100%);margin-left:0!important}
-.sidebar.open{transform:translateX(0)}
-}
+.msg{max-width:80%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.5}
+.msg.user{align-self:flex-end;background:#3b82f6;color:#fff;border-bottom-right-radius:4px}
+.msg.bot{align-self:flex-start;background:#2a2a2a;color:#e5e5e5;border:1px solid #333}
+.msg img{max-width:200px;border-radius:10px;margin-top:8px;display:block}
+.input-area{display:flex;gap:10px;padding:12px;background:#202020;border-top:1px solid #2a2a2a;align-items:center}
+.input-area input[type=text]{flex:1;padding:12px 16px;border-radius:24px;border:1px solid #333;background:#2a2a2a;color:#fff;outline:none}
+.file-lbl{width:44px;height:44px;background:#2a2a2a;border:1px solid #333;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.preview{display:none;padding:10px 16px;background:#111;border-top:1px solid #2a2a2a;color:#ccc;gap:10px;align-items:center}
+.preview.on{display:flex}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;justify-content:center;align-items:center;z-index:100}
+.modal.on{display:flex}
+.box{background:#1e1e1e;width:90%;max-width:400px;padding:22px;border-radius:16px;border:1px solid #333;color:#fff}
+.box input,.box select{width:100%;padding:11px;border-radius:8px;background:#2a2a2a;border:1px solid #333;color:#fff;margin:6px 0 12px}
+.box.row{display:flex;gap:10px;margin-top:12px}
+.box.row button{flex:1;padding:10px;border-radius:8px;border:none;font-weight:700;cursor:pointer}
+.primary{background:#3b82f6;color:#fff}
+.secondary{background:#2a2a2a;color:#ccc;border:1px solid #333!important}
+@media(max-width:768px){.sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}}
 </style>
 </head>
 <body>
 <div class="app">
   <aside id="sidebar" class="sidebar">
-    <div class="sidebar-header"><h2>🤖 As AI</h2><button id="close-sidebar">✕</button></div>
-    <button id="new-chat-sidebar" class="new-chat-btn">+ Chat Baru</button>
-    <div id="chat-list-sidebar"></div>
-    <div class="sidebar-footer">
-      <div id="user-box" class="user-box" style="display:none;">
-        <div class="avatar">👤</div>
-        <div style="flex:1;overflow:hidden"><p id="user-email" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></p><small style="color:#888">Login</small></div>
-      </div>
-      <button id="login-open-btn" class="side-btn">🔑 Login Email</button>
-      <button id="logout-btn" class="side-btn logout" style="display:none;">🚪 Keluar Akun</button>
-      <button id="settings-open-btn" class="side-btn">⚙️ Pengaturan API</button>
+    <div class="sidebar-header"><b>🤖 As AI</b><button id="closeSide" class="icon-btn">✕</button></div>
+    <button id="newChat" class="new-btn">+ Chat Baru</button>
+    <div id="chatList" class="chat-list"></div>
+    <div class="side-footer">
+      <div id="userInfo" style="display:none;color:#fff;font-size:12px;background:#1f1f1f;padding:10px;border-radius:10px;margin-bottom:6px">👤 <span id="userEmail"></span></div>
+      <button id="btnLogin" class="side-action">🔑 Masuk Akun</button>
+      <button id="btnLogout" class="side-action logout" style="display:none">🚪 Keluar Akun</button>
+      <button id="btnApi" class="side-action">⚙️ Pengaturan API Key</button>
     </div>
   </aside>
 
-  <div class="chat-container">
-    <header class="chat-header">
-      <button id="open-sidebar">☰</button>
-      <div style="flex:1;min-width:0"><h1 id="chat-title" style="font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Chat Baru</h1><p id="user-status" style="font-size:11px;color:#888">Belum login</p></div>
-      <button id="clear-btn">🗑️</button>
-    </header>
-    <main id="chat-box" class="chat-box"></main>
-    <div id="file-preview" class="file-preview"></div>
-    <form id="chat-form" class="chat-input">
-      <label for="file-input" class="file-btn">📎</label>
-      <input type="file" id="file-input" accept="image/*,video/*,.pdf,.txt" hidden />
-      <input type="text" id="user-input" placeholder="Ketik pesan..." autocomplete="off" required />
-      <button type="submit" id="send-btn">➤</button>
+  <div class="main">
+    <div class="main-header">
+      <button id="openSide" class="icon-btn">☰</button>
+      <div style="flex:1"><b id="title">Chat Baru</b><br><small id="status" style="color:#888">Belum login</small></div>
+      <button id="clearChat" class="icon-btn">🗑️</button>
+    </div>
+    <div id="chatBox" class="chat-box"></div>
+    <div id="filePrev" class="preview"></div>
+    <form id="chatForm" class="input-area">
+      <label class="file-lbl" for="fileIn">📎</label>
+      <input type="file" id="fileIn" hidden accept="image/*,video/*,.pdf,.txt">
+      <input type="text" id="userIn" placeholder="Ketik pesan..." autocomplete="off">
+      <button id="sendBtn" class="icon-btn" style="background:#3b82f6;border:none">➤</button>
     </form>
   </div>
 </div>
 
-<!-- LOGIN MODAL -->
-<div id="login-modal" class="modal"><div class="modal-content"><h2>🔑 Login</h2><p style="color:#aaa;font-size:13px;margin:8px 0 12px">Pakai email aja, gak perlu password. Chat kesimpan per email.</p><label>Email</label><input type="email" id="login-email" placeholder="kamu@gmail.com"><label>Nama</label><input type="text" id="login-name" placeholder="Nama panggilan"><div class="modal-actions"><button id="login-submit-btn">Masuk</button><button id="login-close-btn" class="secondary">Batal</button></div></div></div>
+<!-- LOGIN -->
+<div id="loginModal" class="modal"><div class="box">
+  <h3>🔑 Masuk Akun</h3><p style="color:#aaa;font-size:13px;margin:8px 0">Masuk pakai email, chat kesimpan per email.</p>
+  <input type="email" id="loginEmail" placeholder="kamu@gmail.com">
+  <input type="text" id="loginName" placeholder="Nama panggilan">
+  <div class="row"><button id="doLogin" class="primary">Masuk</button><button id="closeLogin" class="secondary">Batal</button></div>
+</div></div>
 
-<!-- API MODAL -->
-<div id="api-modal" class="modal"><div class="modal-content"><h2>⚙️ API Key</h2><label>Key 1 Wajib</label><input type="password" id="api-key-1" placeholder="AIza..."><label>Key 2</label><input type="password" id="api-key-2"><label>Key 3</label><input type="password" id="api-key-3"><label>Model</label><select id="model-select"><option value="gemini-3.5-flash">gemini-3.5-flash (bisa baca foto)</option><option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (hemat)</option></select><div class="modal-actions"><button id="save-api-btn">💾 Simpan</button><button id="close-api-btn" class="secondary">Tutup</button></div></div></div>
+<!-- API -->
+<div id="apiModal" class="modal"><div class="box">
+  <h3>⚙️ Pengaturan API Key</h3>
+  <label>Key 1 (wajib)</label><input type="password" id="key1" placeholder="AIza...">
+  <label>Key 2 (opsional)</label><input type="password" id="key2">
+  <label>Key 3 (opsional)</label><input type="password" id="key3">
+  <label>Model</label><select id="modelSel"><option value="gemini-3.5-flash">gemini-3.5-flash (bisa foto)</option><option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite</option></select>
+  <div class="row"><button id="saveApi" class="primary">💾 Simpan</button><button id="closeApi" class="secondary">Tutup</button></div>
+  <p style="font-size:11px;color:#888;margin-top:10px">Ambil gratis di aistudio.google.com/apikey</p>
+</div></div>
 
 <script>
-const $ = id => document.getElementById(id);
-const sidebar = $('sidebar');
-const chatBox = $('chat-box');
-let user = JSON.parse(localStorage.getItem('user_login')||'null');
-let allChats = JSON.parse(localStorage.getItem('all_chats')||'{}');
-let currentChatId = localStorage.getItem('current_chat_id') || Date.now().toString();
-if(!allChats[currentChatId]) allChats[currentChatId]=[];
-let apiKeys = JSON.parse(localStorage.getItem('gemini_keys')||'[]');
-let selectedFile=null, currentKeyIndex=0;
+const $=i=>document.getElementById(i);
+const sidebar=$('sidebar'), chatBox=$('chatBox');
+let user=JSON.parse(localStorage.getItem('user_login')||'null');
+let allChats=JSON.parse(localStorage.getItem('all_chats')||'{}');
+let curId=localStorage.getItem('current_chat_id')||Date.now().toString();
+if(!allChats[curId]) allChats[curId]=[];
+let apiKeys=JSON.parse(localStorage.getItem('gemini_keys')||'[]');
+let selFile=null, keyIdx=0;
 
-function updateUI(){
-  if(user){
-    $('user-box').style.display='flex';
-    $('user-email').innerText=user.email;
-    $('login-open-btn').style.display='none';
-    $('logout-btn').style.display='block';
-    $('user-status').innerText=user.email;
-  }else{
-    $('user-box').style.display='none';
-    $('login-open-btn').style.display='block';
-    $('logout-btn').style.display='none';
-    $('user-status').innerText='Belum login - klik 🔑';
-  }
+// SIDEBAR - FIX 100%
+$('openSide').onclick=()=>sidebar.classList.add('open');
+$('closeSide').onclick=()=>sidebar.classList.remove('open');
+
+// LOGIN - FIX
+function refreshUser(){
+  if(user){$('userInfo').style.display='block';$('userEmail').innerText=user.email;$('btnLogin').style.display='none';$('btnLogout').style.display='block';$('status').innerText=user.email;}
+  else{$('userInfo').style.display='none';$('btnLogin').style.display='block';$('btnLogout').style.display='none';$('status').innerText='Belum login';}
 }
-updateUI();
-
-// SIDEBAR TOGGLE - FIX
-$('open-sidebar').onclick = ()=> sidebar.classList.add('open');
-$('close-sidebar').onclick = ()=> sidebar.classList.remove('open');
-sidebar.addEventListener('click', e=>{ if(e.target===sidebar) sidebar.classList.remove('open'); });
-
-// LOGIN - FIX + LOGOUT ADA
-$('login-open-btn').onclick = ()=> $('login-modal').classList.add('open');
-$('login-close-btn').onclick = ()=> $('login-modal').classList.remove('open');
-$('login-submit-btn').onclick = ()=>{
-  const email=$('login-email').value.trim(), name=$('login-name').value.trim()||email.split('@')[0];
-  if(!email.includes('@')) return alert('Email salah');
-  user={email,name}; localStorage.setItem('user_login', JSON.stringify(user));
-  $('login-modal').classList.remove('open'); updateUI();
+refreshUser();
+$('btnLogin').onclick=()=>$('loginModal').classList.add('on');
+$('closeLogin').onclick=()=>$('loginModal').classList.remove('on');
+$('doLogin').onclick=()=>{
+  const em=$('loginEmail').value.trim(), nm=$('loginName').value.trim()||em.split('@')[0];
+  if(!em.includes('@')) return alert('Email salah');
+  user={email:em,name:nm}; localStorage.setItem('user_login',JSON.stringify(user));
+  $('loginModal').classList.remove('on'); refreshUser();
 };
-$('logout-btn').onclick = ()=>{
-  if(confirm('Yakin mau keluar akun? Chat tetap kesimpan kok.')){
-    localStorage.removeItem('user_login'); user=null; updateUI();
-    $('login-modal').classList.add('open');
-  }
+$('btnLogout').onclick=()=>{
+  if(confirm('Keluar akun? Chat tetap kesimpan.')){localStorage.removeItem('user_login');user=null;refreshUser();}
 };
 
-// API MODAL
-$('settings-open-btn').onclick = ()=>{ $('api-modal').classList.add('open'); $('api-key-1').value=apiKeys[0]||''; $('api-key-2').value=apiKeys[1]||''; $('api-key-3').value=apiKeys[2]||''; };
-$('close-api-btn').onclick = ()=> $('api-modal').classList.remove('open');
-$('save-api-btn').onclick = ()=>{
-  const k1=$('api-key-1').value.trim(); if(!k1) return alert('Key 1 wajib');
-  apiKeys=[k1,$('api-key-2').value.trim(),$('api-key-3').value.trim()].filter(k=>k);
-  localStorage.setItem('gemini_keys', JSON.stringify(apiKeys));
-  localStorage.setItem('gemini_model', $('model-select').value);
-  $('api-modal').classList.remove('open');
+// API MODAL - FIX KELIHATAN
+$('btnApi').onclick=()=>{
+  $('apiModal').classList.add('on');
+  $('key1').value=apiKeys[0]||''; $('key2').value=apiKeys[1]||''; $('key3').value=apiKeys[2]||'';
+  $('modelSel').value=localStorage.getItem('gemini_model')||'gemini-2.0-flash';
 };
-if(apiKeys.length===0) $('api-modal').classList.add('open');
+$('closeApi').onclick=()=>$('apiModal').classList.remove('on');
+$('saveApi').onclick=()=>{
+  const k1=$('key1').value.trim(); if(!k1) return alert('Key 1 wajib isi');
+  apiKeys=[k1,$('key2').value.trim(),$('key3').value.trim()].filter(x=>x);
+  localStorage.setItem('gemini_keys',JSON.stringify(apiKeys));
+  localStorage.setItem('gemini_model',$('modelSel').value);
+  $('apiModal').classList.remove('on'); alert('API Key disimpan!');
+};
+if(apiKeys.length===0) $('apiModal').classList.add('on');
 
-// CHAT SAVE
-function saveAll(){ localStorage.setItem('all_chats', JSON.stringify(allChats)); localStorage.setItem('current_chat_id', currentChatId); renderList(); }
+// CHAT LIST + TITIK TIGA - FIX
+function save(){localStorage.setItem('all_chats',JSON.stringify(allChats));localStorage.setItem('current_chat_id',curId);renderList();}
 function renderList(){
-  const list=$('chat-list-sidebar'); list.innerHTML='';
+  const list=$('chatList'); list.innerHTML='';
   Object.keys(allChats).reverse().forEach(id=>{
-    const t=allChats[id][0]?.text||'Chat Baru';
-    const d=document.createElement('div'); d.className='chat-item'+(id===currentChatId?' active':'');
-    d.innerHTML=`<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px">${t.substring(0,25)}</span><span data-del="${id}" style="color:#ff5555">✕</span>`;
-    d.onclick=(e)=>{ if(!e.target.dataset.del){ currentChatId=id; loadChat(); sidebar.classList.remove('open'); } };
-    list.appendChild(d);
+    const first=allChats[id][0]?.text||'Chat Baru';
+    const div=document.createElement('div'); div.className='chat-item'+(id===curId?' active':'');
+    div.innerHTML=`<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${first.slice(0,24)}</span>
+    <button class="dot-btn">⋮</button>
+    <div class="dot-menu"><button data-act="rename">✏️ Rename</button><button data-act="del">🗑️ Hapus</button></div>`;
+    const dot=div.querySelector('.dot-btn'), menu=div.querySelector('.dot-menu');
+    dot.onclick=e=>{e.stopPropagation(); document.querySelectorAll('.dot-menu').forEach(m=>{if(m!==menu)m.classList.remove('open')}); menu.classList.toggle('open');};
+    menu.querySelector('[data-act="del"]').onclick=e=>{e.stopPropagation(); if(confirm('Hapus chat ini?')){delete allChats[id]; if(id===curId){curId=Date.now().toString(); allChats[curId]=[];} save(); load();}};
+    menu.querySelector('[data-act="rename"]').onclick=e=>{
+      e.stopPropagation(); const nn=prompt('Nama baru:',first); if(nn){ allChats[id][0].text=nn; if(allChats[id][0]) allChats[id][0].text=nn; save(); } menu.classList.remove('open');
+    };
+    div.onclick=()=>{curId=id; load(); sidebar.classList.remove('open');};
+    list.appendChild(div);
   });
-  list.querySelectorAll('[data-del]').forEach(b=> b.onclick=e=>{ e.stopPropagation(); delete allChats[b.dataset.del]; if(b.dataset.del===currentChatId){ currentChatId=Date.now().toString(); allChats[currentChatId]=[];} saveAll(); loadChat(); });
 }
-function loadChat(){ chatBox.innerHTML=''; (allChats[currentChatId]||[]).forEach(m=> addMsg(m.text,m.sender,m.fileUrl,false)); $('chat-title').innerText=allChats[currentChatId][0]?.text?.substring(0,20)||'Chat Baru'; saveAll(); }
-function addMsg(text,sender,fileUrl,save=true){
-  const div=document.createElement('div'); div.className='message '+sender; div.textContent=text;
-  if(fileUrl) div.innerHTML+=`<img src="${fileUrl}">`;
-  chatBox.appendChild(div); chatBox.scrollTop=chatBox.scrollHeight;
-  if(save){ allChats[currentChatId].push({text,sender,fileUrl}); saveAll(); } return div;
-}
-renderList(); loadChat();
+function load(){chatBox.innerHTML='';(allChats[curId]||[]).forEach(m=>add(m.text,m.sender,m.file,false));$('title').innerText=(allChats[curId][0]?.text||'Chat Baru').slice(0,20);save();}
+function add(t,s,f,sv=true){const d=document.createElement('div');d.className='msg '+s;d.textContent=t; if(f) d.innerHTML+=`<img src="${f}">`; chatBox.appendChild(d); chatBox.scrollTop=chatBox.scrollHeight; if(sv){allChats[curId].push({text:t,sender:s,file:f}); save();} return d;}
+renderList(); load();
+$('newChat').onclick=()=>{curId=Date.now().toString(); allChats[curId]=[]; chatBox.innerHTML=''; $('title').innerText='Chat Baru'; save(); sidebar.classList.remove('open');};
+$('clearChat').onclick=()=>{if(confirm('Hapus pesan di chat ini?')){allChats[curId]=[]; chatBox.innerHTML=''; save();}};
 
-$('new-chat-sidebar').onclick=()=>{ currentChatId=Date.now().toString(); allChats[currentChatId]=[]; chatBox.innerHTML=''; $('chat-title').innerText='Chat Baru'; saveAll(); sidebar.classList.remove('open'); };
-$('clear-btn').onclick=()=>{ if(confirm('Hapus chat ini?')){ allChats[currentChatId]=[]; chatBox.innerHTML=''; saveAll(); } };
-
-// FILE + KIRIM
-$('file-input').onchange=async e=>{
+// FILE + KIRIM - FIX INPUT MUNCUL
+$('fileIn').onchange=async e=>{
   const f=e.target.files[0]; if(!f) return;
-  const b64=await new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(f); });
-  selectedFile={base64:b64.split(',')[1], mimeType:f.type, preview:b64};
-  $('file-preview').innerHTML=`<img src="${b64}" style="width:50px;border-radius:6px"><span>${f.name}</span><button onclick="this.parentElement.classList.remove('active');selectedFile=null" style="margin-left:auto;background:#ff4444;border:none;color:#fff;width:22px;height:22px;border-radius:50%">✕</button>`;
-  $('file-preview').classList.add('active');
+  const b64=await new Promise(r=>{const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(f);});
+  selFile={b64:b64.split(',')[1], mime:f.type, prev:b64, name:f.name};
+  $('filePrev').innerHTML=`<img src="${b64}" style="width:50px;border-radius:6px"><span>${f.name}</span><button onclick="this.parentElement.classList.remove('on');selFile=null" style="margin-left:auto;background:#ff4444;border:none;color:#fff;width:22px;height:22px;border-radius:50%">✕</button>`;
+  $('filePrev').classList.add('on');
 };
-$('chat-form').addEventListener('submit', async e=>{
+$('chatForm').addEventListener('submit', async e=>{
   e.preventDefault();
-  if(!user) return alert('Login dulu!'), $('login-modal').classList.add('open');
-  const text=$('user-input').value.trim(); if(!text &&!selectedFile) return;
-  const file=selectedFile; addMsg(text,'user',file?.preview,true); $('user-input').value=''; $('file-preview').classList.remove('active'); selectedFile=null;
-  const load=addMsg('...','bot',null,false);
+  if(!user) return $('loginModal').classList.add('on'), alert('Login dulu!');
+  const txt=$('userIn').value.trim(); if(!txt &&!selFile) return;
+  const file=selFile; add(txt,'user',file?.prev,true); $('userIn').value=''; $('filePrev').classList.remove('on'); selFile=null;
+  const loadEl=add('...','bot',null,false);
   const model=localStorage.getItem('gemini_model')||'gemini-2.0-flash';
-  const parts=[]; if(text) parts.push({text}); if(file) parts.push({inlineData:{mimeType:file.mimeType,data:file.base64}});
+  const parts=[]; if(txt) parts.push({text:txt}); if(file) parts.push({inlineData:{mimeType:file.mime,data:file.b64}});
   for(let i=0;i<apiKeys.length;i++){
     try{
-      const key=apiKeys[currentKeyIndex%apiKeys.length];
+      const key=apiKeys[keyIdx%apiKeys.length];
       const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
-      const data=await res.json(); load.remove();
-      if(data.candidates){ addMsg(data.candidates[0].content.parts[0].text,'bot',null,true); return; } else currentKeyIndex++;
-    }catch{ currentKeyIndex++; }
+      const data=await res.json(); loadEl.remove();
+      if(data.candidates){add(data.candidates[0].content.parts[0].text,'bot',null,true); return;} else keyIdx++;
+    }catch{keyIdx++;}
   }
-  load.remove(); addMsg('❌ API Key limit / error, ganti di ⚙️','bot',null,true);
+  loadEl.remove(); add('❌ Semua API Key limit, tambah key baru di ⚙️','bot',null,true);
 });
+
+// klik luar nutup menu titik tiga
+document.addEventListener('click',()=>document.querySelectorAll('.dot-menu').forEach(m=>m.classList.remove('open')));
 </script>
 </body>
   </html>
