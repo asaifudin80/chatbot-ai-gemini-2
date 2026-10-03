@@ -60,19 +60,16 @@ body{font-family:system-ui;background:#0e0e10;color:#fff;display:flex;height:100
     </div>
   </div>
 </div>
-
 <div id="main">
-<div id="top"><span id="title">Chat Baru</span><span id="status" style="font-size:11px;color:#aaa">Belum login</span></div>
-<div id="chatBox"></div>
-<div id="preview"><img id="pImg"><span id="pName" style="flex:1;font-size:12px"></span><button onclick="clearF()" style="background:#f44;border:none;color:#fff;width:24px;height:24px;border-radius:50%">x</button></div>
+  <div id="top"><span style="display:flex;gap:10px;align-items:center"><button id="ham" style="background:none;border:none;color:#fff;font-size:20px;display:none">☰</button><b id="title">Chat Baru</b></span><span id="status" style="font-size:11px;color:#aaa">Belum login</span></div>
+  <div id="chatBox"></div>
+  <div id="preview"><img id="pImg"><span id="pName" style="flex:1;font-size:12px"></span><button onclick="clearF()" style="background:#f44;border:none;color:#fff;width:24px;height:24px;border-radius:50%">x</button></div>
 <div id="inpArea">
-<button class="icon" onclick="document.getElementById('fInput').click()">📎</button>
+  <button class="icon" onclick="document.getElementById('fInput').click()">📎</button>
 <button class="icon" onclick="document.getElementById('mInput').click()">🖼️</button>
 <input type="file" id="fInput" hidden><input type="file" id="mInput" hidden accept="image/*,video/*">
-<input id="msgInp" placeholder="Ketik..."><button class="b" style="background:#fff;color:#000" onclick="send()">Kirim</button>
+  <div id="inpBar"><input id="msgInp" placeholder="Ketik pesan..."><button id="btnSend">Kirim</button></div>
 </div>
-</div>
-
 <div id="loginModal" class="modal"><div class="box">
   <h3>Login Privat</h3><p style="font-size:12px;color:#aaa">Riwayat akan disimpan per email, jadi privat.</p>
   <input id="loginName" placeholder="Nama (opsional)"><input id="loginEmail" placeholder="Email kamu">
