@@ -1,66 +1,105 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI Chat</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Chat Fix</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:system-ui;background:#0e0e10;color:#fff;display:flex;height:100vh;height:100dvh;overflow:hidden}
-#sidebar{width:280px;background:#171717;display:flex;flex-direction:column;padding:12px;flex-shrink:0}
-#chatList{flex:1;overflow-y:auto;margin:12px 0;display:flex;flex-direction:column;gap:6px}
-.item{padding:10px 12px;border-radius:10px;background:#212121;display:flex;justify-content:space-between;align-items:center;position:relative;cursor:pointer}
-.item.active{background:#2f2f2f;border:1px solid #3a3a3a}
-.dot{background:none;border:none;color:#aaa;font-size:18px;cursor:pointer;padding:4px 8px}
-.menu{display:none;position:absolute;right:8px;top:40px;background:#2a2a2a;border-radius:10px;z-index:50;min-width:130px;box-shadow:0 4px 20px rgba(0,0,0,.5)}
-.menu.on{display:block}.menu button{width:100%;padding:10px;background:none;border:none;color:#fff;text-align:left;cursor:pointer}
-.menu button:hover{background:#3a3a3a}
-.sideBottom{display:flex;flex-direction:column;gap:8px;border-top:1px solid #2a2a2a;padding-top:10px;flex-shrink:0}
-.sideBottom button{padding:10px;border-radius:10px;border:none;font-weight:600;cursor:pointer}
-#btnNew{background:#fff;color:#000}#btnLogin,#btnApi{background:#2f2f2f;color:#fff}#btnLogout{background:#ff4d4d;color:#fff}
-#main{flex:1;display:flex;flex-direction:column;min-width:0}
-#top{padding:12px 16px;background:#171717;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2a2a2a}
-#chatBox{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
-.msg{padding:10px 14px;border-radius:14px;max-width:85%;line-height:1.5;word-break:break-word}
-.msg.user{align-self:flex-end;background:#2f2f2f}.msg.ai{align-self:flex-start;background:#1e1e1e;border:1px solid #2a2a2a}
-.msg img{max-width:100%;border-radius:8px;margin-top:6px}
-#inpBar{padding:10px;background:#171717;display:flex;gap:6px;align-items:center;border-top:1px solid #2a2a2a;flex-shrink:0}
-#inpBar input[type=text]{flex:1;padding:12px 16px;border-radius:24px;border:none;background:#2f2f2f;color:#fff;outline:none}
-.iconBtn{width:38px;height:38px;border-radius:50%;border:none;background:#2f2f2f;color:#fff;font-size:18px;cursor:pointer;flex-shrink:0}
-#btnSend{padding:10px 18px;border-radius:24px;border:none;background:#fff;color:#000;font-weight:700;cursor:pointer}
-#previewBar{display:none;padding:8px 12px;background:#1a1a1a;gap:8px;align-items:center;border-top:1px solid #2a2a2a}
-#previewBar img{width:40px;height:40px;border-radius:6px;object-fit:cover}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:999;padding:16px}
-.modal.on{display:flex}.box{background:#212121;padding:20px;border-radius:16px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px;max-height:90vh;overflow-y:auto}
-.box input,.box select{padding:11px;border-radius:10px;border:none;background:#2f2f2f;color:#fff;width:100%}
-.box label{font-size:12px;color:#aaa}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui;background:#121212;color:#fff;display:flex;height:100dvh;overflow:hidden}
+#sidebar{width:100%;max-width:300px;background:#1e1e1e;display:flex;flex-direction:column;padding:12px}
+#chatList{flex:1;overflow:auto;margin:10px 0;background:#121212;border-radius:8px;padding:10px;min-height:150px}
+#main{flex:1;display:flex;flex-direction:column;background:#121212;min-width:0}
+#top{padding:14px;background:#1e1e1e;border-bottom:1px solid #333;display:flex;justify-content:space-between}
+#chatBox{flex:1;overflow:auto;padding:16px}
+#inpArea{padding:10px;background:#1e1e1e;display:flex;gap:6px;align-items:center}
+#inpArea input{flex:1;padding:12px;border-radius:20px;border:none;background:#333;color:#fff;outline:none}
+.b{padding:10px 14px;border:none;border-radius:20px;cursor:pointer;font-weight:700}
+.b:active{transform:scale(0.95)}
+#btnNew{background:#fff;color:#000;width:100%;margin-top:8px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:9999}
+.modal.on{display:flex}.box{background:#2a2a2a;padding:20px;border-radius:12px;width:90%;max-width:360px;display:flex;flex-direction:column;gap:10px}
+.box input,.box select{padding:10px;border-radius:8px;border:none;background:#333;color:#fff;width:100%}
+.icon{width:40px;height:40px;border-radius:50%;border:none;background:#333;color:#fff;font-size:18px;cursor:pointer}
+#preview{display:none;padding:8px;background:#222;align-items:center;gap:8px}
+#preview img{width:36px;height:36px;object-fit:cover;border-radius:6px}
 </style>
-</head>
-<body>
+</head><body>
 
 <div id="sidebar">
-  <div style="padding:8px 4px"><b>AI Chat</b></div>
-  <div id="userBox" style="display:none;margin:8px 0;padding:10px;background:#2a2a2a;border-radius:10px;font-size:13px"><span id="uEmail"></span></div>
-  <div id="chatList"></div>
-  <div class="sideBottom">
-    <button id="btnNew">+ Chat Baru</button>
-    <div style="display:flex;gap:8px"><button id="btnLogin" style="flex:1">Login</button><button id="btnLogout" style="flex:1;display:none">Logout</button><button id="btnApi">⚙️</button></div>
-  </div>
+<b>AI Chat</b>
+<div id="userBox" style="display:none;margin:8px 0;padding:8px;background:#333;border-radius:8px;font-size:12px"><span id="uEmail"></span></div>
+<div id="chatList">Memuat...</div>
+<div style="display:flex;flex-direction:column;gap:8px;margin-top:auto">
+<button id="btnNew" class="b" onclick="newChat()">+ Chat Baru</button>
+<div style="display:flex;gap:8px">
+<button class="b" style="flex:1;background:#333;color:#fff" onclick="openLogin()">Login</button>
+<button class="b" style="flex:1;background:#ff4d4d;color:#fff;display:none" id="btnLogout" onclick="doLogout()">Logout</button>
+<button class="b" style="background:#333;color:#fff" onclick="openApi()">⚙️</button>
+</div>
+</div>
 </div>
 
 <div id="main">
-  <div id="top"><b id="title">Chat Baru</b><span id="status" style="font-size:11px;color:#aaa">Belum login</span></div>
-  <div id="chatBox"></div>
-  <div id="previewBar"><img id="prevImg"><span id="prevName" style="flex:1;font-size:12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis"></span><button onclick="clearFile()" style="background:#ff4d4d;border:none;color:#fff;border-radius:50%;width:24px;height:24px">✕</button></div>
-  <div id="inpBar">
-    <button class="iconBtn" id="btnFile" title="Upload File">📎</button>
-    <button class="iconBtn" id="btnMedia" title="Upload Gambar">🖼️</button>
-    <input type="file" id="fileInput" style="display:none">
-    <input type="file" id="mediaInput" accept="image/*,video/*,audio/*" style="display:none">
-    <input type="text" id="msgInp" placeholder="Ketik pesan...">
-    <button id="btnSend">Kirim</button>
-  </div>
+<div id="top"><span id="title">Chat Baru</span><span id="status" style="font-size:11px;color:#aaa">Belum login</span></div>
+<div id="chatBox"></div>
+<div id="preview"><img id="pImg"><span id="pName" style="flex:1;font-size:12px"></span><button onclick="clearF()" style="background:#f44;border:none;color:#fff;width:24px;height:24px;border-radius:50%">x</button></div>
+<div id="inpArea">
+<button class="icon" onclick="document.getElementById('fInput').click()">📎</button>
+<button class="icon" onclick="document.getElementById('mInput').click()">🖼️</button>
+<input type="file" id="fInput" hidden><input type="file" id="mInput" hidden accept="image/*,video/*">
+<input id="msgInp" placeholder="Ketik..."><button class="b" style="background:#fff;color:#000" onclick="send()">Kirim</button>
+</div>
 </div>
 
-<div id="loginModal" class="modal"><div class="box">
-  <h3>Login Privat</h3><input id="loginName" placeholder="Nama"><input id="loginEmail" placeholder="Email">
-  <button id="doLogin" style="padding:11px;border:none;border
+<div id="loginM" class="modal"><div class="box">
+<h3>Login</h3><input id="lName" placeholder="Nama"><input id="lEmail" placeholder="Email">
+<button class="b" style="background:#fff;color:#000" onclick="doLogin()">Masuk</button>
+<button class="b" style="background:none;color:#888" onclick="closeM('loginM')">Batal</button>
+</div></div>
+
+<div id="apiM" class="modal"><div class="box">
+<h3>API & Model</h3><input id="k1" placeholder="API Key 1 wajib"><input id="k2" placeholder="Key 2"><input id="k3" placeholder="Key 3">
+<select id="mSel" onchange="document.getElementById('cBox').style.display=this.value=='custom'?'block':'none'">
+<option value="gemini-3.5-flash" selected>gemini-3.5-flash</option>
+  <option value="gemini-3.5-flash-lite" selected>gemini-3.5-flash-lite</option>
+<option value="gemini-1.5-flash">gemini-1.5-flash</option>
+<option value="gemini-1.5-pro">gemini-1.5-pro</option>
+<option value="gemini-1.0-pro">gemini-1.0-pro (3.5)</option>
+<option value="custom">Custom</option>
+</select>
+<div id="cBox" style="display:none"><input id="cInput" placeholder="model custom"></div>
+<button class="b" style="background:#fff;color:#000" onclick="saveApi()">Simpan</button>
+<button class="b" style="background:none;color:#888" onclick="closeM('apiM')">Tutup</button>
+</div></div>
+
+<script>
+var user=null; try{user=JSON.parse(localStorage.getItem('user_login')||'null')}catch(e){user=null}
+var keys=[]; try{keys=JSON.parse(localStorage.getItem('gemini_keys')||'[]')}catch(e){keys=[]}
+var cur=localStorage.getItem('cur_id')||Date.now().toString();
+var allChats={}; var pend=null;
+
+function getKey(){ if(!user) return null; return 'all_chats_'+user.email; }
+function loadChats(){ var k=getKey(); if(!k){allChats={};return} try{allChats=JSON.parse(localStorage.getItem(k)||'{}')}catch(e){allChats={}} }
+function saveChats(){ var k=getKey(); if(!k) return; localStorage.setItem(k,JSON.stringify(allChats)); localStorage.setItem('cur_id',cur); }
+loadChats();
+
+function openLogin(){document.getElementById('loginM').classList.add('on')}
+function openApi(){document.getElementById('apiM').classList.add('on'); document.getElementById('k1').value=keys[0]||''; document.getElementById('k2').value=keys[1]||''; document.getElementById('k3').value=keys[2]||'';}
+function closeM(id){document.getElementById(id).classList.remove('on')}
+function doLogin(){ var e=document.getElementById('lEmail').value.trim(); if(e.indexOf('@')==-1){alert('Email salah');return} user={email:e,name:document.getElementById('lName').value||e.split('@')[0]}; localStorage.setItem('user_login',JSON.stringify(user)); closeM('loginM'); refresh(); }
+function doLogout(){ if(confirm('Keluar?')){localStorage.removeItem('user_login'); user=null; cur=Date.now().toString(); refresh();}}
+function newChat(){ if(!user){alert('Login dulu 🥰'); openLogin(); return} cur=Date.now().toString(); allChats[cur]=[]; saveChats(); load(); render(); }
+function refresh(){
+  if(user){ document.getElementById('userBox').style.display='block'; document.getElementById('uEmail').innerText=user.email; document.getElementById('status').innerText=user.email; document.querySelector('#sidebar button[onclick="openLogin()"]').style.display='none'; document.getElementById('btnLogout').style.display='block'; loadChats(); if(Object.keys(allChats).length==0){cur=Date.now().toString(); allChats[cur]=[];} else if(!allChats[cur]){cur=Object.keys(allChats)[0];} load(); render();
+  }else{ document.getElementById('userBox').style.display='none'; document.querySelector('#sidebar button[onclick="openLogin()"]').style.display='block'; document.getElementById('btnLogout').style.display='none'; document.getElementById('status').innerText='Belum login'; allChats={}; document.getElementById('chatList').innerHTML='<div style="text-align:center;color:#666;padding:20px;font-size:12px">🔒 Login dulu<br>untuk melihat riwayat</div>'; document.getElementById('chatBox').innerHTML='<div style="text-align:center;color:#555;margin-top:30px">Login dulu ya 🥰</div>'; }
+}
+function save(){saveChats(); render();}
+function load(){ var box=document.getElementById('chatBox'); box.innerHTML=''; (allChats[cur]||[]).forEach(function(m){ var d=document.createElement('div'); d.style.padding='10px'; d.style.marginBottom='8px'; d.style.borderRadius='12px'; d.style.maxWidth='85%'; if(m.role=='user'){d.style.alignSelf='flex-end'; d.style.background='#333'; d.style.marginLeft='auto';}else{d.style.background='#222'; d.style.border='1px solid #333';} if(m.image){ d.innerText=m.text; var im=document.createElement('img'); im.src=m.image; im.style.maxWidth='100%'; im.style.marginTop='6px'; im.style.borderRadius='8px'; d.appendChild(document.createElement('br')); d.appendChild(im);} else d.innerText=m.text; box.appendChild(d); }); document.getElementById('title').innerText=((allChats[cur]||[])[0]?.text||'Chat Baru').slice(0,20); box.scrollTop=box.scrollHeight; }
+function render(){
+  if(!user) return; var list=document.getElementById('chatList'); list.innerHTML=''; if(Object.keys(allChats).length==0){list.innerHTML='<div style="text-align:center;color:#555;font-size:12px">Belum ada chat</div>';return;}
+  Object.keys(allChats).reverse().forEach(function(id){ var f=(allChats[id][0]?.text||'Chat Baru').slice(0,20); var d=document.createElement('div'); d.style.padding='8px'; d.style.background=id==cur?'#333':'#222'; d.style.marginBottom='4px'; d.style.borderRadius='8px'; d.style.cursor='pointer'; d.innerText=f; d.onclick=function(){cur=id; load(); render();}; list.appendChild(d); });
+}
+function handleFile(file){ if(!file) return; var r=new FileReader(); r.onload=function(e){ pend={name:file.name,data:e.target.result,mime:file.type,isImage:file.type.indexOf('image')==0}; document.getElementById('preview').style.display='flex'; document.getElementById('pName').innerText=file.name; if(pend.isImage) document.getElementById('pImg').src=e.target.result; }; r.readAsDataURL(file); }
+document.getElementById('fInput').onchange=function(e){handleFile(e.target.files[0])}; document.getElementById('mInput').onchange=function(e){handleFile(e.target.files[0])};
+function clearF(){pend=null; document.getElementById('preview').style.display='none'; document.getElementById('fInput').value=''; document.getElementById('mInput').value='';}
+function saveApi(){ var k1=document.getElementById('k1').value.trim(); if(!k1){alert('Key 1 wajib');return} keys=[k1,document.getElementById('k2').value.trim(),document.getElementById('k3').value.trim()].filter(function(x){return x}); var m=document.getElementById('mSel').value; if(m=='custom'){m=document.getElementById('cInput').value.trim(); if(!m){alert('Isi model');return}} localStorage.setItem('gemini_keys',JSON.stringify(keys)); localStorage.setItem('gemini_model',m); closeM('apiM'); alert('Disimpan '+m); }
+async function send(){ var txt=document.getElementById('msgInp').value.trim(); if(!txt &&!pend) return; if(!user){alert('Login dulu');openLogin();return} if(keys.length==0){alert('Set API Key di ⚙️'); openApi(); return} if(!allChats[cur]) allChats[cur]=[]; var um={role:'user',text:txt+(pend?' [File: '+pend.name+']':'')}; if(pend && pend.isImage) um.image=pend.data; allChats[cur].push(um); document.getElementById('msgInp').value=''; var fs=pend; clearF(); load(); save(); var model=localStorage.getItem('gemini_model')||'gemini-2.0-flash'; try{ var parts=[{text:txt||'Jelaskan file ini'}]; if(fs){parts.push({inline_data:{mime_type:fs.mime,data:fs.data.split(',')[1]}})} var res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+keys[0],{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:parts}]})}); var data=await res.json(); var rep=data.candidates?.[0]?.content?.parts?.[0]?.text||'Error: '+(data.error?.message||'gagal'); allChats[cur].push({role:'ai',text:rep}); save(); load(); }catch(e){ allChats[cur].push({role:'ai',text:'Error '+e.message}); save(); load(); } }
+document.getElementById('msgInp').addEventListener('keydown',function(e){if(e.key=='Enter')send()});
+refresh(); render(); load();
+</script></body></html>
