@@ -110,37 +110,71 @@ if(!allChats[cur]) allChats[cur]=[];
 let keys=JSON.parse(localStorage.getItem('gemini_keys')||'[]');
 let file=null, kIdx=0;
 
-function refreshUser(){if(user){$('userBox').style.display='block';$('uEmail').innerText=user.email;$('btnLogin').style.display='none';$('btnLogout').style.display='block';$('status').innerText=user.email}else{$('userBox').style.display='none';$('btnLogin').style.display='block';$('btnLogout').style.display='none';$('status').innerText='Belum login';}} refreshUser();
-$('openSide').onclick=()=>$('sidebar').classList.add('open');
-$('closeSide').onclick=()=>$('sidebar').classList.remove('open');
-$('btnLogin').onclick=()=>$('loginModal').classList.add('on');
-$('closeLogin').onclick=()=>$('loginModal').classList.remove('on');
-$('doLogin').onclick=()=>{const e=$('loginEmail').value.trim(); if(!e.includes('@')) return alert('Email salah'); user={email:e,name:$('loginName').value.trim()||e.split('@')[0]}; localStorage.setItem('user_login',JSON.stringify(user)); $('loginModal').classList.remove('on'); refreshUser();};
-$('btnLogout').onclick=()=>{if(confirm('Keluar?')){localStorage.removeItem('user_login'); user=null; refreshUser();}};
-$('btnApi').onclick=()=>{
-  $('apiModal').classList.add('on');
-  const names=JSON.parse(localStorage.getItem('key_names')||'["","",""]');
-  $('keyName1').value=names[0]||''; $('keyName2').value=names[1]||''; $('keyName3').value=names[2]||'';
-  $('key1').value=keys[0]||''; $('key2').value=keys[1]||''; $('key3').value=keys[2]||'';
-  $('keyMode').value=localStorage.getItem('key_mode')||'auto';
-  $('modelSel').value=localStorage.getItem('gemini_model')||'gemini-2.0-flash';
+function refreshUser(){
+  if(user){
+    $('userBox').style.display='block';
+    $('uEmail').innerText=user.email;
+    $('doLogin').onclick=()=>{
+  const e=$('loginEmail').value.trim(); 
+  if(!e.includes('@')) return alert('Email salah'); 
+  user={email:e,name:$('loginName').value.trim()||e.split('@')[0]}; 
+  localStorage.setItem('user_login',JSON.stringify(user)); 
+  $('loginModal').classList.remove('on'); 
+  refreshUser(); // <-- INI YANG PENTING, biar langsung load chat punya email ini
 };
-$('closeApi').onclick=()=>$('apiModal').classList.remove('on');
-$('saveApi').onclick=()=>{
-  const k1=$('key1').value.trim(); if(!k1) return alert('Key 1 wajib');
-  keys=[k1,$('key2').value.trim(),$('key3').value.trim()].filter(x=>x);
-  const names=[$('keyName1').value.trim(),$('keyName2').value.trim(),$('keyName3').value.trim()];
-  localStorage.setItem('gemini_keys',JSON.stringify(keys));
-  localStorage.setItem('key_names',JSON.stringify(names));
-  localStorage.setItem('key_mode',$('keyMode').value);
-  localStorage.setItem('gemini_model',$('modelSel').value);
-  $('apiModal').classList.remove('on');
-};
-if(keys.length==0) $('apiModal').classList.add('on');
 
-function save(){localStorage.setItem('all_chats',JSON.stringify(allChats)); localStorage.setItem('cur_id',cur); render();}
+$('btnLogout').onclick=()=>{
+  if(confirm('Keluar? Riwayat chat akan disembunyikan, tapi tetap kesimpan untuk email ini.')){
+    localStorage.removeItem('user_login');
+    user=null;
+    cur=Date.now().toString(); // reset chat id
+    refreshUser(); // <-- INI YANG PENTING, biar sidebar jadi kosong 🔒
+  }
+};
+    $('status').innerText=user.email;
+    loadUserChats(); // load chat punya email ini
+    if(!allChats[cur]) { cur=Object.keys(allChats)[0] || Date.now().toString(); if(!allChats[cur]) allChats[cur]=[]; }
+    load();
+  }else{
+    $('userBox').style.display='none';
+    $('doLogin').onclick=()=>{
+  const e=$('loginEmail').value.trim(); 
+  if(!e.includes('@')) return alert('Email salah'); 
+  user={email:e,name:$('loginName').value.trim()||e.split('@')[0]}; 
+  localStorage.setItem('user_login',JSON.stringify(user)); 
+  $('loginModal').classList.remove('on'); 
+  refreshUser(); // <-- INI YANG PENTING, biar langsung load chat punya email ini
+};
+
+$('btnLogout').onclick=()=>{
+  if(confirm('Keluar? Riwayat chat akan disembunyikan, tapi tetap kesimpan untuk email ini.')){
+    localStorage.removeItem('user_login');
+    user=null;
+    cur=Date.now().toString(); // reset chat id
+    refreshUser(); // <-- INI YANG PENTING, biar sidebar jadi kosong 🔒
+  }
+};
+    $('status').innerText='Belum login - login untuk lihat riwayat';
+    allChats = {};
+    $('chatList').innerHTML = '<p style="color:#666;font-size:12px;padding:10px;text-align:center">🔒 Login dulu<br>untuk melihat riwayat chat</p>';
+    $('chatBox').innerHTML = '';
+    $('title').innerText = 'Chat Baru';
+  }
+}
+
+function save(){
+  saveUserChats();
+  render();
+}
+
 function render(){
-  const list=$('chatList'); list.innerHTML='';
+  const list=$('chatList');
+  if(!user){ return; } // kalau belum login jangan render
+  list.innerHTML='';
+  if(Object.keys(allChats).length===0){
+    list.innerHTML='<p style="color:#555;font-size:12px;padding:10px;text-align:center">Belum ada chat</p>';
+    return;
+  }
   Object.keys(allChats).reverse().forEach(id=>{
     const f=allChats[id][0]?.text||'Chat Baru';
     const d=document.createElement('div'); d.className='item'+(id==cur?' active':'');
@@ -152,7 +186,7 @@ function render(){
     d.onclick=()=>{cur=id; load(); if(window.innerWidth<=768) $('sidebar').classList.remove('open');};
     list.appendChild(d);
   });
-}
+  }
 function load(){$('chatBox').innerHTML=''; (allChats[cur]||[]).forEach(m=>add(m.text,m.sender,m.file,false)); $('title').innerText=(allChats[cur][0]?.text||'Chat Baru').slice(0,20); save();}
 function add(t,s,f,sv=true){const d=document.createElement('div'); d.className='msg '+s; d.textContent=t; if(f) d.innerHTML+=`<img src="${f}">`; $('chatBox').appendChild(d); $('chatBox').scrollTop=99999; if(sv){allChats[cur].push({text:t,sender:s,file:f}); save();} return d;}
 render(); load();
