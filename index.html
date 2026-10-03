@@ -1,81 +1,100 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI Chat - Private</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>AI Chat</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui;background:#0e0e10;color:#fff;display:flex;height:100vh;overflow:hidden}
-#sidebar{width:260px;background:#171717;display:flex;flex-direction:column;padding:10px;transition:.3s}
-#chatList{flex:1;overflow:auto;margin:10px 0}
-.item{padding:10px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;background:#212121}
-.item.active{background:#2f2f2f}.dot{background:none;border:none;color:#aaa;cursor:pointer}
-.menu{display:none;position:absolute;right:10px;top:35px;background:#2a2a2a;border-radius:8px;overflow:hidden;z-index:10}
-.menu.on{display:block}.menu button{display:block;width:100%;padding:8px 12px;background:none;border:none;color:#fff;text-align:left;cursor:pointer}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui;background:#0e0e10;color:#fff;display:flex;height:100vh;height:100dvh;overflow:hidden}
+#sidebar{width:280px;background:#171717;display:flex;flex-direction:column;padding:12px;flex-shrink:0;overflow:hidden}
+#sideTop{display:flex;justify-content:space-between;align-items:center;padding:8px 4px}
+#chatList{flex:1;overflow-y:auto;margin:12px 0;display:flex;flex-direction:column;gap:6px}
+.item{padding:10px 12px;border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:#212121;position:relative;flex-shrink:0}
+.item.active{background:#2f2f2f;border:1px solid #3a3a3a}
+.dot{background:none;border:none;color:#aaa;cursor:pointer;padding:4px 8px;font-size:18px}
+.menu{display:none;position:absolute;right:8px;top:40px;background:#2a2a2a;border-radius:10px;overflow:hidden;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.5);min-width:130px}
+.menu.on{display:block}.menu button{display:block;width:100%;padding:10px 12px;background:none;border:none;color:#fff;text-align:left;cursor:pointer;font-size:13px}
 .menu button:hover{background:#3a3a3a}
-#main{flex:1;display:flex;flex-direction:column}
-#top{padding:12px 16px;background:#171717;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2a2a2a}
-#chatBox{flex:1;overflow:auto;padding:20px}
-.msg{margin-bottom:14px;max-width:80%}.msg.user{margin-left:auto;background:#2f2f2f;padding:10px 14px;border-radius:14px}
-.msg.ai{background:#1e1e1e;padding:10px 14px;border-radius:14px}
-#inpBar{padding:12px;background:#171717;display:flex;gap:8px}
-#inpBar input{flex:1;padding:12px;border-radius:20px;border:none;background:#2f2f2f;color:#fff;outline:none}
-button{cursor:pointer}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:100}
+.sideBottom{display:flex;flex-direction:column;gap:8px;padding-top:8px;border-top:1px solid #2a2a2a;flex-shrink:0}
+.sideBottom button{padding:10px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
+#btnNew{background:#fff;color:#000}
+#btnLogin{background:#2f2f2f;color:#fff} #btnLogout{background:#ff4d4d;color:#fff}
+#btnApi{background:#2f2f2f;color:#fff}
+
+#main{flex:1;display:flex;flex-direction:column;min-width:0;background:#0e0e10}
+#top{padding:12px 16px;background:#171717;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2a2a2a;flex-shrink:0}
+#chatBox{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+.msg{padding:10px 14px;border-radius:14px;max-width:85%;line-height:1.5;word-break:break-word}
+.msg.user{align-self:flex-end;background:#2f2f2f}
+.msg.ai{align-self:flex-start;background:#1e1e1e;border:1px solid #2a2a2a}
+#inpBar{padding:12px;background:#171717;display:flex;gap:8px;flex-shrink:0;border-top:1px solid #2a2a2a}
+#inpBar input{flex:1;padding:12px 16px;border-radius:24px;border:none;background:#2f2f2f;color:#fff;outline:none}
+#btnSend{padding:12px 18px;border-radius:24px;border:none;background:#fff;color:#000;font-weight:700}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:999;padding:16px}
 .modal.on{display:flex}
-.box{background:#212121;padding:20px;border-radius:12px;width:90%;max-width:400px;display:flex;flex-direction:column;gap:10px}
-.box input,.box select{padding:10px;border-radius:8px;border:none;background:#2f2f2f;color:#fff}
+.box{background:#212121;padding:20px;border-radius:16px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px;max-height:90vh;overflow-y:auto}
+.box input,.box select{padding:11px;border-radius:10px;border:none;background:#2f2f2f;color:#fff;outline:none;width:100%}
+.box label{font-size:12px;color:#aaa;margin-top:4px}
+.box h3{margin-bottom:4px}
+
+@media(max-width:768px){
+  #sidebar{position:fixed;left:-100%;top:0;bottom:0;z-index:900;width:80%;max-width:300px;transition:.3s}
+  #sidebar.open{left:0}
+}
 </style>
 </head>
 <body>
 
 <div id="sidebar">
-  <h3>AI Chat</h3>
-  <div id="userBox" style="display:none;margin:10px 0;padding:8px;background:#2a2a2a;border-radius:8px"><span id="uEmail"></span></div>
+  <div id="sideTop"><b>AI Chat</b><span id="closeSide" style="display:none;cursor:pointer">✕</span></div>
+  <div id="userBox" style="display:none;margin:8px 0;padding:10px;background:#2a2a2a;border-radius:10px;font-size:13px"><span id="uEmail"></span></div>
   <div id="chatList"></div>
-  <button id="btnNew" style="padding:10px;border:none;border-radius:8px;background:#fff;color:#000">+ Chat Baru</button>
-  <div style="display:flex;gap:6px;margin-top:8px">
-    <button id="btnLogin" style="flex:1;padding:8px;border-radius:8px;border:none">Login</button>
-    <button id="btnLogout" style="flex:1;padding:8px;border-radius:8px;border:none;display:none;background:#ff4d4d;color:#fff">Logout</button>
-    <button id="btnApi" style="padding:8px;border-radius:8px;border:none">⚙️</button>
+  <div class="sideBottom">
+    <button id="btnNew">+ Chat Baru</button>
+    <div style="display:flex;gap:8px">
+      <button id="btnLogin" style="flex:1">Login</button>
+      <button id="btnLogout" style="flex:1;display:none">Logout</button>
+      <button id="btnApi">⚙️</button>
+      <button id="openSide" style="display:none">☰</button>
+    </div>
   </div>
 </div>
 
 <div id="main">
-  <div id="top"><span id="title">Chat Baru</span><span id="status" style="font-size:12px;color:#aaa"></span></div>
+  <div id="top"><span style="display:flex;gap:10px;align-items:center"><button id="ham" style="background:none;border:none;color:#fff;font-size:20px;display:none">☰</button><b id="title">Chat Baru</b></span><span id="status" style="font-size:11px;color:#aaa">Belum login</span></div>
   <div id="chatBox"></div>
-  <div id="inpBar"><input id="msgInp" placeholder="Ketik pesan..."><button id="btnSend" style="padding:10px 16px;border:none;border-radius:20px;background:#fff;color:#000">Kirim</button></div>
+  <div id="inpBar"><input id="msgInp" placeholder="Ketik pesan..."><button id="btnSend">Kirim</button></div>
 </div>
 
-<!-- LOGIN MODAL -->
 <div id="loginModal" class="modal"><div class="box">
-  <h3>Login</h3><input id="loginName" placeholder="Nama"><input id="loginEmail" placeholder="Email">
-  <button id="doLogin" style="padding:10px;border:none;border-radius:8px;background:#fff;color:#000">Masuk</button>
-  <button onclick="document.getElementById('loginModal').classList.remove('on')" style="background:none;border:none;color:#aaa">Batal</button>
+  <h3>Login Privat</h3><p style="font-size:12px;color:#aaa">Riwayat akan disimpan per email, jadi privat.</p>
+  <input id="loginName" placeholder="Nama (opsional)"><input id="loginEmail" placeholder="Email kamu">
+  <button id="doLogin" style="padding:11px;border:none;border-radius:10px;background:#fff;color:#000;font-weight:700">Masuk</button>
+  <button onclick="document.getElementById('loginModal').classList.remove('on')" style="background:none;border:none;color:#888">Batal</button>
 </div></div>
 
-<!-- API MODAL -->
 <div id="apiModal" class="modal"><div class="box">
   <h3>Setting API & Model</h3>
-  <label>Nama Key 1</label><input id="keyName1" placeholder="Nama Key 1">
-  <input id="key1" placeholder="API Key 1 (wajib)">
-  <label>Nama Key 2</label><input id="keyName2"><input id="key2" placeholder="API Key 2 (opsional)">
-  <label>Nama Key 3</label><input id="keyName3"><input id="key3" placeholder="API Key 3 (opsional)">
-  <label>Mode Key</label><select id="keyMode"><option value="auto">Auto Ganti</option><option value="manual">Manual</option></select>
+  <label>Nama Key 1</label><input id="keyName1" placeholder="Key Pribadi"><input id="key1" placeholder="API Key 1 wajib">
+  <label>Nama Key 2</label><input id="keyName2" placeholder="Key Cadangan"><input id="key2" placeholder="API Key 2">
+  <label>Nama Key 3</label><input id="keyName3" placeholder="Key Cadangan"><input id="key3" placeholder="API Key 3">
+  <label>Mode</label><select id="keyMode"><option value="auto">Auto Ganti</option><option value="manual">Manual</option></select>
   <label>Model</label>
-  <select id="modelSel" onchange="if(this.value==='custom'){document.getElementById('customModelBox').style.display='block'}else{document.getElementById('customModelBox').style.display='none'}">
-    <option value="gemini-2.5-pro-exp-03-25">gemini-2.5-pro (TERBARU 2026)</option>
+  <select id="modelSel" onchange="document.getElementById('customModelBox').style.display=this.value==='custom'?'block':'none'">
+    <option value="gemini-2.5-pro-exp-03-25">gemini-2.5-pro (TERBARU)</option>
     <option value="gemini-2.5-flash-preview-04-17">gemini-2.5-flash</option>
-    <option value="gemini-3.5-flash" selected>gemini-3.5-flash (STABIL 3.5)</option>
-    <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (3.5 Hemat)</option>
+    <option value="gemini-3.5-flash" selected>gemini-3.5-flash (STABIL)</option>
+    <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite</option>
     <option value="gemini-1.5-pro">gemini-1.5-pro</option>
     <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-    <option value="gemini-1.0-pro">gemini-1.0-pro (Versi 3.5)</option>
-    <option value="gemini-1.0-pro-latest">gemini-1.0-pro-latest (Versi 3.0)</option>
+    <option value="gemini-1.0-pro">gemini-1.0-pro (3.5)</option>
+    <option value="gemini-1.0-pro-latest">gemini-1.0-pro (3.0)</option>
     <option value="custom">✏️ Custom Manual</option>
   </select>
-  <div id="customModelBox" style="display:none"><input id="customModelInput" placeholder="Contoh: gpt-3.5-turbo"></div>
-  <button id="saveApi" style="padding:10px;border:none;border-radius:8px;background:#fff;color:#000">Simpan</button>
-  <button onclick="document.getElementById('apiModal').classList.remove('on')" style="background:none;border:none;color:#aaa">Tutup</button>
+  <div id="customModelBox" style="display:none"><input id="customModelInput" placeholder="ketik: gpt-3.5-turbo"></div>
+  <button id="saveApi" style="padding:11px;border:none;border-radius:10px;background:#fff;color:#000;font-weight:700">Simpan</button>
+  <button onclick="document.getElementById('apiModal').classList.remove('on')" style="background:none;border:none;color:#888">Tutup</button>
 </div></div>
 
 <script>
@@ -83,14 +102,11 @@ const $=id=>document.getElementById(id);
 let user=JSON.parse(localStorage.getItem('user_login')||'null');
 let keys=JSON.parse(localStorage.getItem('gemini_keys')||'[]');
 let cur=localStorage.getItem('cur_id')||Date.now().toString();
-
-// === PRIVATE CHAT PER EMAIL ===
 function getChatKey(){ if(!user) return null; return `all_chats_${user.email}`; }
 let allChats={};
 function loadUserChats(){ const k=getChatKey(); if(!k){allChats={};return;} allChats=JSON.parse(localStorage.getItem(k)||'{}'); }
 function saveUserChats(){ const k=getChatKey(); if(!k) return; localStorage.setItem(k,JSON.stringify(allChats)); localStorage.setItem('cur_id',cur); }
-loadUserChats();
-if(!allChats[cur] && user){ allChats[cur]=[]; }
+loadUserChats(); if(user &&!allChats[cur]){ allChats[cur]=[]; }
 
 function refreshUser(){
   if(user){
@@ -98,14 +114,16 @@ function refreshUser(){
     $('btnLogin').style.display='none'; $('btnLogout').style.display='block';
     $('status').innerText=user.email;
     loadUserChats();
-    if(!allChats[cur] || Object.keys(allChats).length===0){ cur=Object.keys(allChats)[0]||Date.now().toString(); if(!allChats[cur]) allChats[cur]=[]; }
+    if(Object.keys(allChats).length===0){ cur=Date.now().toString(); allChats[cur]=[]; }
+    else if(!allChats[cur]){ cur=Object.keys(allChats)[0]; }
     load(); render();
   }else{
     $('userBox').style.display='none'; $('btnLogin').style.display='block'; $('btnLogout').style.display='none';
     $('status').innerText='Belum login';
     allChats={};
-    $('chatList').innerHTML='<p style="color:#666;font-size:12px;padding:20px;text-align:center">🔒 Login dulu<br>untuk melihat riwayat</p>';
-    $('chatBox').innerHTML=''; $('title').innerText='Chat Baru';
+    $('chatList').innerHTML='<div style="color:#666;font-size:12px;padding:30px 10px;text-align:center;line-height:1.6">🔒 Login dulu<br>untuk melihat riwayat</div>';
+    $('chatBox').innerHTML='<div style="color:#555;text-align:center;margin-top:40px">Silahkan login dulu ya 🥰</div>';
+    $('title').innerText='Chat Baru';
   }
 }
 function save(){ saveUserChats(); render(); }
@@ -114,28 +132,26 @@ function load(){
   (allChats[cur]||[]).forEach(m=>{
     const d=document.createElement('div'); d.className='msg '+(m.role==='user'?'user':'ai'); d.innerText=m.text; box.appendChild(d);
   });
-  const f=allChats[cur]?.[0]?.text||'Chat Baru'; $('title').innerText=f.slice(0,30);
+  $('title').innerText=(allChats[cur]?.[0]?.text||'Chat Baru').slice(0,28);
   box.scrollTop=box.scrollHeight;
 }
 function render(){
   if(!user) return;
   const list=$('chatList'); list.innerHTML='';
-  if(Object.keys(allChats).length===0){ list.innerHTML='<p style="color:#555;font-size:12px;padding:10px;text-align:center">Belum ada chat</p>'; return; }
+  if(Object.keys(allChats).length===0){ list.innerHTML='<div style="color:#555;font-size:12px;padding:10px;text-align:center">Belum ada chat</div>'; return; }
   Object.keys(allChats).reverse().forEach(id=>{
     const f=allChats[id][0]?.text||'Chat Baru';
     const d=document.createElement('div'); d.className='item'+(id==cur?' active':'');
-    d.style.position='relative';
-    d.innerHTML=`<span style="flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${f.slice(0,22)}</span><button class="dot">⋮</button><div class="menu"><button data-a="ren">✏️ Rename</button><button data-a="del">🗑️ Hapus</button></div>`;
+    d.innerHTML=`<span style="flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:13px">${f.slice(0,26)}</span><button class="dot">⋮</button><div class="menu"><button data-a="ren">✏️ Rename</button><button data-a="del">🗑️ Hapus</button></div>`;
     const dot=d.querySelector('.dot'), menu=d.querySelector('.menu');
     dot.onclick=e=>{e.stopPropagation(); document.querySelectorAll('.menu').forEach(m=>{if(m!=menu)m.classList.remove('on')}); menu.classList.toggle('on');};
-    menu.querySelector('[data-a="del"]').onclick=e=>{e.stopPropagation(); if(confirm('Hapus?')){delete allChats[id]; if(id==cur){cur=Date.now().toString(); allChats[cur]=[];} save(); load();}};
-    menu.querySelector('[data-a="ren"]').onclick=e=>{e.stopPropagation(); const nn=prompt('Nama baru',f); if(nn){ if(allChats[id][0]) allChats[id][0].text=nn; save();} menu.classList.remove('on');};
-    d.onclick=()=>{cur=id; load(); render();};
+    menu.querySelector('[data-a="del"]').onclick=e=>{e.stopPropagation(); if(confirm('Hapus chat ini?')){delete allChats[id]; if(id==cur){cur=Date.now().toString(); allChats[cur]=[];} save(); load();}};
+    menu.querySelector('[data-a="ren"]').onclick=e=>{e.stopPropagation(); const nn=prompt('Nama baru',f); if(nn){ if(allChats[id][0]) allChats[id][0].text=nn; else allChats[id]=[{role:'user',text:nn}]; save(); load();} menu.classList.remove('on');};
+    d.onclick=()=>{cur=id; load(); render(); if(window.innerWidth<=768) $('sidebar').classList.remove('open');};
     list.appendChild(d);
   });
 }
 document.addEventListener('click',()=>document.querySelectorAll('.menu').forEach(m=>m.classList.remove('on')));
-
 $('btnLogin').onclick=()=>$('loginModal').classList.add('on');
 $('doLogin').onclick=()=>{
   const e=$('loginEmail').value.trim(); if(!e.includes('@')) return alert('Email salah');
@@ -148,7 +164,7 @@ $('btnLogout').onclick=()=>{
     localStorage.removeItem('user_login'); user=null; cur=Date.now().toString(); refreshUser();
   }
 };
-$('btnNew').onclick=()=>{ if(!user) return alert('Login dulu!'); cur=Date.now().toString(); allChats[cur]=[]; save(); load(); };
+$('btnNew').onclick=()=>{ if(!user) return alert('Login dulu ya 🥰'); cur=Date.now().toString(); allChats[cur]=[]; save(); load(); };
 $('btnApi').onclick=()=>{
   $('apiModal').classList.add('on');
   const names=JSON.parse(localStorage.getItem('key_names')||'["","",""]');
@@ -170,21 +186,19 @@ $('saveApi').onclick=()=>{
 };
 $('btnSend').onclick=async()=>{
   const txt=$('msgInp').value.trim(); if(!txt) return;
-  if(!user) return alert('Login dulu!');
-  if(keys.length===0) return alert('Set API Key dulu di ⚙️');
+  if(!user) return alert('Login dulu!'); if(keys.length===0) return alert('Set API Key di ⚙️');
   if(!allChats[cur]) allChats[cur]=[];
   allChats[cur].push({role:'user',text:txt}); $('msgInp').value=''; load(); save();
   const model=localStorage.getItem('gemini_model')||'gemini-3.5-flash';
   try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${keys[0]}`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:txt}]}]})
-    });
-    const data=await res.json();
-    const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'Error: '+(data.error?.message||'gagal');
+    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${keys[0]}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:txt}]}]})});
+    const d=await r.json(); const reply=d.candidates?.[0]?.content?.parts?.[0]?.text||'Error: '+(d.error?.message||'gagal');
     allChats[cur].push({role:'ai',text:reply}); save(); load();
   }catch(e){ allChats[cur].push({role:'ai',text:'Error: '+e.message}); save(); load(); }
 };
+$('msgInp').addEventListener('keydown',e=>{if(e.key==='Enter')$('btnSend').click()});
+$('ham').onclick=()=>$('sidebar').classList.add('open');
+if(window.innerWidth<=768){ $('ham').style.display='block'; }
 refreshUser(); render(); load();
 </script>
 </body>
