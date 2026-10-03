@@ -1,276 +1,208 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chatbot AI</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: Arial, sans-serif;
-      background: #1e1e2e;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-      min-height: 100vh;
-    }
-    .chat-box {
-      width: 100%;
-      max-width: 500px;
-      background: #2a2a3e;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,.4);
-      display: flex;
-      flex-direction: column;
-      height: 90vh;
-      max-height: 700px;
-    }
-    .header {
-      background: #6c5ce7;
-      color: white;
-      padding: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .header .title { font-size: 18px; }
-    .header .controls { display: flex; gap: 8px; }
-    .icon-btn {
-      background: rgba(255,255,255,.15);
-      border: none;
-      color: white;
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background .2s;
-    }
-    .icon-btn:hover { background: rgba(255,255,255,.3); }
-    .icon-btn.active { background: #00b894; }
-    #messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .msg {
-      max-width: 80%;
-      padding: 10px 14px;
-      border-radius: 12px;
-      line-height: 1.4;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      animation: muncul .2s ease;
-    }
-    @keyframes muncul {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .user {
-      align-self: flex-end;
-      background: #6c5ce7;
-      color: white;
-      border-bottom-right-radius: 2px;
-    }
-    .bot {
-      align-self: flex-start;
-      background: #3d3d5c;
-      color: #eee;
-      border-bottom-left-radius: 2px;
-    }
-    .input-area {
-      display: flex;
-      padding: 10px;
-      gap: 8px;
-      background: #232336;
-    }
-    input {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      background: #3d3d5c;
-      color: white;
-      outline: none;
-      font-size: 15px;
-    }
-    input:focus { background: #454568; }
-    button.send {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      background: #6c5ce7;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 15px;
-    }
-    button.send:hover { background: #5a4bd1; }
-    button.send:disabled { opacity: .5; cursor: not-allowed; }
-    #messages::-webkit-scrollbar { width: 6px; }
-    #messages::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>As AI Pro</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{background:#0f0f0f;height:100vh;overflow:hidden}
+.app{display:flex;height:100vh;width:100vw}
+/* SIDEBAR FIX */
+.sidebar{width:280px;min-width:280px;background:#171717;border-right:1px solid #2a2a2a;display:flex;flex-direction:column;transform:translateX(0);transition:0.3s}
+.sidebar.hidden{margin-left:-280px}
+.sidebar-header{display:flex;justify-content:space-between;align-items:center;padding:16px;color:#fff;border-bottom:1px solid #2a2a2a}
+.new-chat-btn{margin:12px;padding:11px;background:#3b82f6;color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:700}
+#chat-list-sidebar{flex:1;overflow-y:auto;padding:8px}
+.chat-item{padding:10px 12px;background:#1f1f1f;margin-bottom:6px;border-radius:8px;color:#ccc;font-size:13px;cursor:pointer;display:flex;justify-content:space-between}
+.chat-item.active{border:1px solid #3b82f6;color:#fff}
+.sidebar-footer{padding:12px;border-top:1px solid #2a2a2a}
+.user-box{display:flex;align-items:center;gap:10px;background:#1f1f1f;padding:10px;border-radius:10px;color:#fff;margin-bottom:8px}
+.user-box.avatar{width:32px;height:32px;background:#3b82f6;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.side-btn{width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid #333;background:#1f1f1f;color:#fff;cursor:pointer;text-align:left}
+.side-btn.logout{color:#ff6b6b;border-color:#ff444433}
+/* MAIN CHAT FIX */
+.chat-container{flex:1;display:flex;flex-direction:column;min-width:0;background:#1a1a1a}
+.chat-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#202020;border-bottom:1px solid #2a2a2a;color:#fff}
+#open-sidebar,#clear-btn{background:#2a2a2a;border:1px solid #333;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px;flex-shrink:0}
+.chat-box{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+.message{max-width:80%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word}
+.message.user{align-self:flex-end;background:#3b82f6;color:#fff;border-bottom-right-radius:4px}
+.message.bot{align-self:flex-start;background:#2a2a2a;color:#e5e5e5;border:1px solid #333}
+.message img{max-width:200px;border-radius:10px;margin-top:8px;display:block}
+/* INPUT FIX - INI YANG HILANG KEMARIN */
+.chat-input{display:flex!important;gap:10px;padding:12px 14px;background:#202020;border-top:1px solid #2a2a2a;align-items:center;position:sticky;bottom:0}
+.chat-input input[type=text]{flex:1;padding:12px 16px;border-radius:24px;border:1px solid #333;background:#2a2a2a;color:#fff;outline:none;min-width:0}
+.file-btn{width:44px;height:44px;background:#2a2a2a;border:1px solid #333;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.file-preview{display:none;padding:10px 16px;background:#171717;border-top:1px solid #2a2a2a;gap:10px;align-items:center;color:#ccc}
+.file-preview.active{display:flex}
+#send-btn{width:44px;height:44px;border-radius:50%;border:none;background:#3b82f6;color:#fff;font-weight:bold;cursor:pointer;flex-shrink:0}
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);justify-content:center;align-items:center;z-index:999}
+.modal.open{display:flex}
+.modal-content{background:#1e1e1e;width:90%;max-width:400px;padding:22px;border-radius:16px;border:1px solid #333;color:#fff}
+.modal-content input,.modal-content select{width:100%;padding:11px;border-radius:8px;background:#2a2a2a;border:1px solid #333;color:#fff;margin:6px 0 12px}
+.modal-actions{display:flex;gap:10px;margin-top:12px}
+.modal-actions button{flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-weight:bold}
+#save-api-btn,#login-submit-btn{background:#3b82f6;color:#fff}
+.secondary{background:#2a2a2a!important;color:#ccc!important;border:1px solid #333!important}
+@media(max-width:768px){
+.sidebar{position:fixed;left:0;top:0;bottom:0;z-index:50;transform:translateX(-100%);margin-left:0!important}
+.sidebar.open{transform:translateX(0)}
+}
+</style>
 </head>
 <body>
-  <div class="chat-box">
-    <div class="header">
-      <span class="title">🤖 Chatbot AI</span>
-      <div class="controls">
-        <button class="icon-btn" id="btnSuara" title="Mode suara">🔊</button>
-        <button class="icon-btn" id="btnHapus" title="Hapus riwayat">🗑️</button>
+<div class="app">
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header"><h2>🤖 As AI</h2><button id="close-sidebar">✕</button></div>
+    <button id="new-chat-sidebar" class="new-chat-btn">+ Chat Baru</button>
+    <div id="chat-list-sidebar"></div>
+    <div class="sidebar-footer">
+      <div id="user-box" class="user-box" style="display:none;">
+        <div class="avatar">👤</div>
+        <div style="flex:1;overflow:hidden"><p id="user-email" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></p><small style="color:#888">Login</small></div>
       </div>
+      <button id="login-open-btn" class="side-btn">🔑 Login Email</button>
+      <button id="logout-btn" class="side-btn logout" style="display:none;">🚪 Keluar Akun</button>
+      <button id="settings-open-btn" class="side-btn">⚙️ Pengaturan API</button>
     </div>
-    <div id="messages"></div>
-    <div class="input-area">
-      <input id="input" placeholder="Tulis pesan..." autofocus>
-      <button class="send" id="btnKirim" onclick="kirim()">Kirim</button>
-    </div>
+  </aside>
+
+  <div class="chat-container">
+    <header class="chat-header">
+      <button id="open-sidebar">☰</button>
+      <div style="flex:1;min-width:0"><h1 id="chat-title" style="font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Chat Baru</h1><p id="user-status" style="font-size:11px;color:#888">Belum login</p></div>
+      <button id="clear-btn">🗑️</button>
+    </header>
+    <main id="chat-box" class="chat-box"></main>
+    <div id="file-preview" class="file-preview"></div>
+    <form id="chat-form" class="chat-input">
+      <label for="file-input" class="file-btn">📎</label>
+      <input type="file" id="file-input" accept="image/*,video/*,.pdf,.txt" hidden />
+      <input type="text" id="user-input" placeholder="Ketik pesan..." autocomplete="off" required />
+      <button type="submit" id="send-btn">➤</button>
+    </form>
   </div>
+</div>
 
-  <script>
-    // ============================================
-    // KONFIGURASI — Ganti dengan API key kamu
-    // ============================================
-    const GEMINI_API_KEY = "AQ.Ab8RN6LQmubV00YdFdfTjr09oCelmG60cdt9qtOrzWtanMqeIg";
+<!-- LOGIN MODAL -->
+<div id="login-modal" class="modal"><div class="modal-content"><h2>🔑 Login</h2><p style="color:#aaa;font-size:13px;margin:8px 0 12px">Pakai email aja, gak perlu password. Chat kesimpan per email.</p><label>Email</label><input type="email" id="login-email" placeholder="kamu@gmail.com"><label>Nama</label><input type="text" id="login-name" placeholder="Nama panggilan"><div class="modal-actions"><button id="login-submit-btn">Masuk</button><button id="login-close-btn" class="secondary">Batal</button></div></div></div>
 
-    const STORAGE_KEY = "chatbot_riwayat";
-    const SUARA_KEY = "chatbot_suara";
+<!-- API MODAL -->
+<div id="api-modal" class="modal"><div class="modal-content"><h2>⚙️ API Key</h2><label>Key 1 Wajib</label><input type="password" id="api-key-1" placeholder="AIza..."><label>Key 2</label><input type="password" id="api-key-2"><label>Key 3</label><input type="password" id="api-key-3"><label>Model</label><select id="model-select"><option value="gemini-3.5-flash">gemini-3.5-flash (bisa baca foto)</option><option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (hemat)</option></select><div class="modal-actions"><button id="save-api-btn">💾 Simpan</button><button id="close-api-btn" class="secondary">Tutup</button></div></div></div>
 
-    // ============================================
-    // RIWAYAT CHAT (localStorage)
-    // ============================================
-    function muatRiwayat() {
-      const data = localStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
-    }
+<script>
+const $ = id => document.getElementById(id);
+const sidebar = $('sidebar');
+const chatBox = $('chat-box');
+let user = JSON.parse(localStorage.getItem('user_login')||'null');
+let allChats = JSON.parse(localStorage.getItem('all_chats')||'{}');
+let currentChatId = localStorage.getItem('current_chat_id') || Date.now().toString();
+if(!allChats[currentChatId]) allChats[currentChatId]=[];
+let apiKeys = JSON.parse(localStorage.getItem('gemini_keys')||'[]');
+let selectedFile=null, currentKeyIndex=0;
 
-    function simpanRiwayat(user, bot) {
-      const riwayat = muatRiwayat();
-      riwayat.push({ user, bot, waktu: Date.now() });
-      if (riwayat.length > 50) riwayat.shift();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(riwayat));
-    }
+function updateUI(){
+  if(user){
+    $('user-box').style.display='flex';
+    $('user-email').innerText=user.email;
+    $('login-open-btn').style.display='none';
+    $('logout-btn').style.display='block';
+    $('user-status').innerText=user.email;
+  }else{
+    $('user-box').style.display='none';
+    $('login-open-btn').style.display='block';
+    $('logout-btn').style.display='none';
+    $('user-status').innerText='Belum login - klik 🔑';
+  }
+}
+updateUI();
 
-    function tampilkanSemuaRiwayat() {
-      const riwayat = muatRiwayat();
-      const container = document.getElementById("messages");
-      container.innerHTML = "";
+// SIDEBAR TOGGLE - FIX
+$('open-sidebar').onclick = ()=> sidebar.classList.add('open');
+$('close-sidebar').onclick = ()=> sidebar.classList.remove('open');
+sidebar.addEventListener('click', e=>{ if(e.target===sidebar) sidebar.classList.remove('open'); });
 
-      if (riwayat.length === 0) {
-        tampilkan("Halo! Ada yang bisa saya bantu?", "bot");
-        return;
-      }
+// LOGIN - FIX + LOGOUT ADA
+$('login-open-btn').onclick = ()=> $('login-modal').classList.add('open');
+$('login-close-btn').onclick = ()=> $('login-modal').classList.remove('open');
+$('login-submit-btn').onclick = ()=>{
+  const email=$('login-email').value.trim(), name=$('login-name').value.trim()||email.split('@')[0];
+  if(!email.includes('@')) return alert('Email salah');
+  user={email,name}; localStorage.setItem('user_login', JSON.stringify(user));
+  $('login-modal').classList.remove('open'); updateUI();
+};
+$('logout-btn').onclick = ()=>{
+  if(confirm('Yakin mau keluar akun? Chat tetap kesimpan kok.')){
+    localStorage.removeItem('user_login'); user=null; updateUI();
+    $('login-modal').classList.add('open');
+  }
+};
 
-      riwayat.forEach(pesan => {
-        tampilkan(pesan.user, "user");
-        tampilkan(pesan.bot, "bot");
-      });
-    }
+// API MODAL
+$('settings-open-btn').onclick = ()=>{ $('api-modal').classList.add('open'); $('api-key-1').value=apiKeys[0]||''; $('api-key-2').value=apiKeys[1]||''; $('api-key-3').value=apiKeys[2]||''; };
+$('close-api-btn').onclick = ()=> $('api-modal').classList.remove('open');
+$('save-api-btn').onclick = ()=>{
+  const k1=$('api-key-1').value.trim(); if(!k1) return alert('Key 1 wajib');
+  apiKeys=[k1,$('api-key-2').value.trim(),$('api-key-3').value.trim()].filter(k=>k);
+  localStorage.setItem('gemini_keys', JSON.stringify(apiKeys));
+  localStorage.setItem('gemini_model', $('model-select').value);
+  $('api-modal').classList.remove('open');
+};
+if(apiKeys.length===0) $('api-modal').classList.add('open');
 
-    function hapusRiwayat() {
-      if (!confirm("Hapus semua riwayat chat?")) return;
-      localStorage.removeItem(STORAGE_KEY);
-      tampilkanSemuaRiwayat();
-    }
+// CHAT SAVE
+function saveAll(){ localStorage.setItem('all_chats', JSON.stringify(allChats)); localStorage.setItem('current_chat_id', currentChatId); renderList(); }
+function renderList(){
+  const list=$('chat-list-sidebar'); list.innerHTML='';
+  Object.keys(allChats).reverse().forEach(id=>{
+    const t=allChats[id][0]?.text||'Chat Baru';
+    const d=document.createElement('div'); d.className='chat-item'+(id===currentChatId?' active':'');
+    d.innerHTML=`<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px">${t.substring(0,25)}</span><span data-del="${id}" style="color:#ff5555">✕</span>`;
+    d.onclick=(e)=>{ if(!e.target.dataset.del){ currentChatId=id; loadChat(); sidebar.classList.remove('open'); } };
+    list.appendChild(d);
+  });
+  list.querySelectorAll('[data-del]').forEach(b=> b.onclick=e=>{ e.stopPropagation(); delete allChats[b.dataset.del]; if(b.dataset.del===currentChatId){ currentChatId=Date.now().toString(); allChats[currentChatId]=[];} saveAll(); loadChat(); });
+}
+function loadChat(){ chatBox.innerHTML=''; (allChats[currentChatId]||[]).forEach(m=> addMsg(m.text,m.sender,m.fileUrl,false)); $('chat-title').innerText=allChats[currentChatId][0]?.text?.substring(0,20)||'Chat Baru'; saveAll(); }
+function addMsg(text,sender,fileUrl,save=true){
+  const div=document.createElement('div'); div.className='message '+sender; div.textContent=text;
+  if(fileUrl) div.innerHTML+=`<img src="${fileUrl}">`;
+  chatBox.appendChild(div); chatBox.scrollTop=chatBox.scrollHeight;
+  if(save){ allChats[currentChatId].push({text,sender,fileUrl}); saveAll(); } return div;
+}
+renderList(); loadChat();
 
-    // ============================================
-    // MODE SUARA (Text-to-Speech)
-    // ============================================
-    let suaraAktif = localStorage.getItem(SUARA_KEY) === "true";
+$('new-chat-sidebar').onclick=()=>{ currentChatId=Date.now().toString(); allChats[currentChatId]=[]; chatBox.innerHTML=''; $('chat-title').innerText='Chat Baru'; saveAll(); sidebar.classList.remove('open'); };
+$('clear-btn').onclick=()=>{ if(confirm('Hapus chat ini?')){ allChats[currentChatId]=[]; chatBox.innerHTML=''; saveAll(); } };
 
-    function updateTombolSuara() {
-      const btn = document.getElementById("btnSuara");
-      btn.classList.toggle("active", suaraAktif);
-      btn.textContent = suaraAktif ? "🔊" : "🔇";
-    }
-
-    function bicara(teks) {
-      if (!suaraAktif || !window.speechSynthesis) return;
-      speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(teks);
-      u.lang = "id-ID";
-      u.rate = 1;
-      u.pitch = 1;
-      speechSynthesis.speak(u);
-    }
-
-    document.getElementById("btnSuara").addEventListener("click", () => {
-      suaraAktif = !suaraAktif;
-      localStorage.setItem(SUARA_KEY, suaraAktif);
-      updateTombolSuara();
-      if (!suaraAktif) speechSynthesis.cancel();
-    });
-
-    // ============================================
-    // KIRIM PESAN KE GEMINI
-    // ============================================
-    async function kirim() {
-      const input = document.getElementById("input");
-      const btn = document.getElementById("btnKirim");
-      const pesan = input.value.trim();
-      if (!pesan) return;
-
-      tampilkan(pesan, "user");
-      input.value = "";
-      btn.disabled = true;
-      const loading = tampilkan("Mengetik...", "bot");
-
-      try {
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${API_KEY}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: pesan }] }]
-            })
-          }
-        );
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          loading.textContent = "⚠️ " + (data.error?.message || "Terjadi kesalahan.");
-          return;
-        }
-
-        const balasan = data.candidates[0].content.parts[0].text;
-        loading.textContent = balasan;
-        simpanRiwayat(pesan, balasan);
-        bicara(balasan);
-
-      } catch (err) {
-        loading.textContent = "❌ Gagal terhubung. Cek internet & API key.";
-      } finally {
-        btn.disabled = false;
-        input.focus();
-      }
-    }
-
-    function tampilkan(teks, siapa) {
-      const div = document.createElement("div");
-      div.className = "msg " + siapa;
-      div.textContent = teks;
-      document.getElementById("messages").appendChild(div);
-      document.getElementById("messages").scrollTop = 999999;
-      return div;
-    }
-
-    // ============================================
-    // INISIALISASI
-    // ============================================
-    document.getElementById("btnHapus").addEventListener("click", hapusRiwayat);
-
-    document.getElementById("input").addEventListener("keydown", e => {
-      if (e.key === "Enter") kirim();
-    });
-
-    updateTombolSuara();
-    tampilkanSemuaRiwayat();
-  </script>
+// FILE + KIRIM
+$('file-input').onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const b64=await new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(f); });
+  selectedFile={base64:b64.split(',')[1], mimeType:f.type, preview:b64};
+  $('file-preview').innerHTML=`<img src="${b64}" style="width:50px;border-radius:6px"><span>${f.name}</span><button onclick="this.parentElement.classList.remove('active');selectedFile=null" style="margin-left:auto;background:#ff4444;border:none;color:#fff;width:22px;height:22px;border-radius:50%">✕</button>`;
+  $('file-preview').classList.add('active');
+};
+$('chat-form').addEventListener('submit', async e=>{
+  e.preventDefault();
+  if(!user) return alert('Login dulu!'), $('login-modal').classList.add('open');
+  const text=$('user-input').value.trim(); if(!text &&!selectedFile) return;
+  const file=selectedFile; addMsg(text,'user',file?.preview,true); $('user-input').value=''; $('file-preview').classList.remove('active'); selectedFile=null;
+  const load=addMsg('...','bot',null,false);
+  const model=localStorage.getItem('gemini_model')||'gemini-2.0-flash';
+  const parts=[]; if(text) parts.push({text}); if(file) parts.push({inlineData:{mimeType:file.mimeType,data:file.base64}});
+  for(let i=0;i<apiKeys.length;i++){
+    try{
+      const key=apiKeys[currentKeyIndex%apiKeys.length];
+      const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
+      const data=await res.json(); load.remove();
+      if(data.candidates){ addMsg(data.candidates[0].content.parts[0].text,'bot',null,true); return; } else currentKeyIndex++;
+    }catch{ currentKeyIndex++; }
+  }
+  load.remove(); addMsg('❌ API Key limit / error, ganti di ⚙️','bot',null,true);
+});
+</script>
 </body>
   </html>
