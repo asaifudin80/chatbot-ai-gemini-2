@@ -2,202 +2,102 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>As AI Pro - FINAL FIX</title>
+<title>FIX INPUT</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-body{background:#0f0f0f;height:100vh;overflow:hidden}
-.app{display:flex;height:100vh}
-.sidebar{width:280px;background:#171717;border-right:1px solid #2a2a2a;display:flex;flex-direction:column;transition:.3s;z-index:20}
-.sidebar-header{padding:16px;display:flex;justify-content:space-between;align-items:center;color:#fff;border-bottom:1px solid #2a2a2a}
-.new-btn{margin:12px;padding:12px;background:#3b82f6;color:#fff;border:0;border-radius:10px;font-weight:700;cursor:pointer}
-.chat-list{flex:1;overflow-y:auto;padding:8px}
-.chat-item{padding:12px;background:#1f1f1f;margin-bottom:6px;border-radius:10px;color:#ccc;display:flex;justify-content:space-between;align-items:center;position:relative;cursor:pointer}
-.chat-item.active{border:1px solid #3b82f6;color:#fff}
-.dot-btn{background:none;border:none;color:#888;font-size:18px;cursor:pointer;padding:0 6px}
-.dot-menu{display:none;position:absolute;right:10px;top:38px;background:#2a2a2a;border:1px solid #333;border-radius:8px;z-index:5;overflow:hidden}
-.dot-menu button{display:block;width:100%;padding:8px 12px;background:none;border:none;color:#fff;text-align:left;font-size:13px;cursor:pointer}
-.dot-menu button:hover{background:#333}
-.dot-menu.open{display:block}
-.side-footer{padding:12px;border-top:1px solid #2a2a2a}
-.side-action{width:100%;padding:11px;border-radius:10px;border:1px solid #333;background:#1f1f1f;color:#fff;cursor:pointer;margin-top:8px;text-align:left}
-.side-action.logout{color:#ff6b6b;border-color:#ff4444}
-.main{flex:1;display:flex;flex-direction:column;min-width:0;background:#1a1a1a}
-.main-header{padding:12px 16px;background:#202020;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;gap:12px;color:#fff}
-.icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid #333;background:#2a2a2a;color:#fff;cursor:pointer;flex-shrink:0}
-.chat-box{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
-.msg{max-width:80%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.5}
-.msg.user{align-self:flex-end;background:#3b82f6;color:#fff;border-bottom-right-radius:4px}
-.msg.bot{align-self:flex-start;background:#2a2a2a;color:#e5e5e5;border:1px solid #333}
-.msg img{max-width:200px;border-radius:10px;margin-top:8px;display:block}
-.input-area{display:flex;gap:10px;padding:12px;background:#202020;border-top:1px solid #2a2a2a;align-items:center}
-.input-area input[type=text]{flex:1;padding:12px 16px;border-radius:24px;border:1px solid #333;background:#2a2a2a;color:#fff;outline:none}
-.file-lbl{width:44px;height:44px;background:#2a2a2a;border:1px solid #333;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.preview{display:none;padding:10px 16px;background:#111;border-top:1px solid #2a2a2a;color:#ccc;gap:10px;align-items:center}
-.preview.on{display:flex}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;justify-content:center;align-items:center;z-index:100}
-.modal.on{display:flex}
-.box{background:#1e1e1e;width:90%;max-width:400px;padding:22px;border-radius:16px;border:1px solid #333;color:#fff}
-.box input,.box select{width:100%;padding:11px;border-radius:8px;background:#2a2a2a;border:1px solid #333;color:#fff;margin:6px 0 12px}
-.box.row{display:flex;gap:10px;margin-top:12px}
-.box.row button{flex:1;padding:10px;border-radius:8px;border:none;font-weight:700;cursor:pointer}
-.primary{background:#3b82f6;color:#fff}
-.secondary{background:#2a2a2a;color:#ccc;border:1px solid #333!important}
-@media(max-width:768px){.sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}}
+*{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}
+body{height:100dvh;display:flex;flex-direction:column;background:#0f0f0f}
+#top{padding:12px;background:#202020;color:#fff;display:flex;gap:10px;align-items:center;border-bottom:1px solid #333}
+#top button{width:36px;height:36px;border-radius:50%;border:1px solid #444;background:#2a2a2a;color:#fff}
+#chatBox{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:80%;padding:10px 14px;border-radius:16px;font-size:14px}
+.msg.user{align-self:flex-end;background:#3b82f6;color:#fff}
+.msg.bot{align-self:flex-start;background:#2a2a2a;color:#fff;border:1px solid #333}
+.msg img{max-width:180px;border-radius:8px;margin-top:6px;display:block}
+
+/* INI INPUT YANG KEMARIN HILANG - AKU PAKSA MUNCUL DI BAWAH */
+#inputBar{
+  display:flex!important;
+  gap:8px;
+  padding:12px;
+  background:#202020;
+  border-top:2px solid red; /* biar kelihatan, nanti hapus aja */
+  position:sticky;
+  bottom:0;
+  left:0;
+  right:0;
+  z-index:99;
+}
+#userIn{
+  flex:1;
+  padding:14px 18px;
+  border-radius:24px;
+  border:1px solid #555;
+  background:#111;
+  color:#fff;
+  outline:none;
+  font-size:16px; /* biar gak zoom di iPhone */
+}
+#sendBtn{width:48px;height:48px;border-radius:50%;border:none;background:#3b82f6;color:#fff;font-size:18px;font-weight:bold}
+
+/* modal api biar gampang */
+#apiBox{display:flex;gap:8px;padding:10px;background:#171717;border-bottom:1px solid #333}
+#apiBox input{flex:1;padding:10px;border-radius:8px;border:1px solid #333;background:#2a2a2a;color:#fff}
 </style>
 </head>
 <body>
-<div class="app">
-  <aside id="sidebar" class="sidebar">
-    <div class="sidebar-header"><b>🤖 As AI</b><button id="closeSide" class="icon-btn">✕</button></div>
-    <button id="newChat" class="new-btn">+ Chat Baru</button>
-    <div id="chatList" class="chat-list"></div>
-    <div class="side-footer">
-      <div id="userInfo" style="display:none;color:#fff;font-size:12px;background:#1f1f1f;padding:10px;border-radius:10px;margin-bottom:6px">👤 <span id="userEmail"></span></div>
-      <button id="btnLogin" class="side-action">🔑 Masuk Akun</button>
-      <button id="btnLogout" class="side-action logout" style="display:none">🚪 Keluar Akun</button>
-      <button id="btnApi" class="side-action">⚙️ Pengaturan API Key</button>
-    </div>
-  </aside>
 
-  <div class="main">
-    <div class="main-header">
-      <button id="openSide" class="icon-btn">☰</button>
-      <div style="flex:1"><b id="title">Chat Baru</b><br><small id="status" style="color:#888">Belum login</small></div>
-      <button id="clearChat" class="icon-btn">🗑️</button>
-    </div>
-    <div id="chatBox" class="chat-box"></div>
-    <div id="filePrev" class="preview"></div>
-    <form id="chatForm" class="input-area">
-      <label class="file-lbl" for="fileIn">📎</label>
-      <input type="file" id="fileIn" hidden accept="image/*,video/*,.pdf,.txt">
-      <input type="text" id="userIn" placeholder="Ketik pesan..." autocomplete="off">
-      <button id="sendBtn" class="icon-btn" style="background:#3b82f6;border:none">➤</button>
-    </form>
-  </div>
+<div id="top">
+  <button onclick="location.reload()">☰</button>
+  <b>As AI - Input Fix</b>
+  <button id="clearBtn" style="margin-left:auto">🗑️</button>
 </div>
 
-<!-- LOGIN -->
-<div id="loginModal" class="modal"><div class="box">
-  <h3>🔑 Masuk Akun</h3><p style="color:#aaa;font-size:13px;margin:8px 0">Masuk pakai email, chat kesimpan per email.</p>
-  <input type="email" id="loginEmail" placeholder="kamu@gmail.com">
-  <input type="text" id="loginName" placeholder="Nama panggilan">
-  <div class="row"><button id="doLogin" class="primary">Masuk</button><button id="closeLogin" class="secondary">Batal</button></div>
-</div></div>
+<div id="apiBox">
+  <input type="password" id="apiKey" placeholder="Paste API Key Gemini (AIza...)">
+  <button id="saveKey" style="padding:10px 14px;border-radius:8px;border:none;background:#3b82f6;color:#fff;font-weight:bold">Simpan</button>
+</div>
 
-<!-- API -->
-<div id="apiModal" class="modal"><div class="box">
-  <h3>⚙️ Pengaturan API Key</h3>
-  <label>Key 1 (wajib)</label><input type="password" id="key1" placeholder="AIza...">
-  <label>Key 2 (opsional)</label><input type="password" id="key2">
-  <label>Key 3 (opsional)</label><input type="password" id="key3">
-  <label>Model</label><select id="modelSel"><option value="gemini-3.5-flash">gemini-3.5-flash (bisa foto)</option><option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite</option></select>
-  <div class="row"><button id="saveApi" class="primary">💾 Simpan</button><button id="closeApi" class="secondary">Tutup</button></div>
-  <p style="font-size:11px;color:#888;margin-top:10px">Ambil gratis di aistudio.google.com/apikey</p>
-</div></div>
+<div id="chatBox"></div>
+
+<!-- INPUT BAR - INI YANG TADI HILANG -->
+<form id="inputBar">
+  <input type="text" id="userIn" placeholder="Ketik pesan disini... (pasti muncul sekarang)" autocomplete="off" required>
+  <button type="submit" id="sendBtn">➤</button>
+</form>
 
 <script>
-const $=i=>document.getElementById(i);
-const sidebar=$('sidebar'), chatBox=$('chatBox');
-let user=JSON.parse(localStorage.getItem('user_login')||'null');
-let allChats=JSON.parse(localStorage.getItem('all_chats')||'{}');
-let curId=localStorage.getItem('current_chat_id')||Date.now().toString();
-if(!allChats[curId]) allChats[curId]=[];
-let apiKeys=JSON.parse(localStorage.getItem('gemini_keys')||'[]');
-let selFile=null, keyIdx=0;
-
-// SIDEBAR - FIX 100%
-$('openSide').onclick=()=>sidebar.classList.add('open');
-$('closeSide').onclick=()=>sidebar.classList.remove('open');
-
-// LOGIN - FIX
-function refreshUser(){
-  if(user){$('userInfo').style.display='block';$('userEmail').innerText=user.email;$('btnLogin').style.display='none';$('btnLogout').style.display='block';$('status').innerText=user.email;}
-  else{$('userInfo').style.display='none';$('btnLogin').style.display='block';$('btnLogout').style.display='none';$('status').innerText='Belum login';}
+const chatBox=document.getElementById('chatBox');
+const userIn=document.getElementById('userIn');
+const apiKeyInput=document.getElementById('apiKey');
+apiKeyInput.value=localStorage.getItem('gemini_key')||'';
+let chats=JSON.parse(localStorage.getItem('chats')||'[]');
+chats.forEach(m=>add(m.t,m.s,false));
+function save(){localStorage.setItem('chats',JSON.stringify(chats));}
+function add(t,s,sv=true){
+  const d=document.createElement('div');d.className='msg '+s;d.textContent=t;chatBox.appendChild(d);chatBox.scrollTop=99999;
+  if(sv){chats.push({t,s}); save();} return d;
 }
-refreshUser();
-$('btnLogin').onclick=()=>$('loginModal').classList.add('on');
-$('closeLogin').onclick=()=>$('loginModal').classList.remove('on');
-$('doLogin').onclick=()=>{
-  const em=$('loginEmail').value.trim(), nm=$('loginName').value.trim()||em.split('@')[0];
-  if(!em.includes('@')) return alert('Email salah');
-  user={email:em,name:nm}; localStorage.setItem('user_login',JSON.stringify(user));
-  $('loginModal').classList.remove('on'); refreshUser();
+document.getElementById('saveKey').onclick=()=>{
+  const k=apiKeyInput.value.trim(); if(!k) return alert('Isi API Key dulu');
+  localStorage.setItem('gemini_key',k); alert('Key disimpan!');
 };
-$('btnLogout').onclick=()=>{
-  if(confirm('Keluar akun? Chat tetap kesimpan.')){localStorage.removeItem('user_login');user=null;refreshUser();}
-};
-
-// API MODAL - FIX KELIHATAN
-$('btnApi').onclick=()=>{
-  $('apiModal').classList.add('on');
-  $('key1').value=apiKeys[0]||''; $('key2').value=apiKeys[1]||''; $('key3').value=apiKeys[2]||'';
-  $('modelSel').value=localStorage.getItem('gemini_model')||'gemini-2.0-flash';
-};
-$('closeApi').onclick=()=>$('apiModal').classList.remove('on');
-$('saveApi').onclick=()=>{
-  const k1=$('key1').value.trim(); if(!k1) return alert('Key 1 wajib isi');
-  apiKeys=[k1,$('key2').value.trim(),$('key3').value.trim()].filter(x=>x);
-  localStorage.setItem('gemini_keys',JSON.stringify(apiKeys));
-  localStorage.setItem('gemini_model',$('modelSel').value);
-  $('apiModal').classList.remove('on'); alert('API Key disimpan!');
-};
-if(apiKeys.length===0) $('apiModal').classList.add('on');
-
-// CHAT LIST + TITIK TIGA - FIX
-function save(){localStorage.setItem('all_chats',JSON.stringify(allChats));localStorage.setItem('current_chat_id',curId);renderList();}
-function renderList(){
-  const list=$('chatList'); list.innerHTML='';
-  Object.keys(allChats).reverse().forEach(id=>{
-    const first=allChats[id][0]?.text||'Chat Baru';
-    const div=document.createElement('div'); div.className='chat-item'+(id===curId?' active':'');
-    div.innerHTML=`<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${first.slice(0,24)}</span>
-    <button class="dot-btn">⋮</button>
-    <div class="dot-menu"><button data-act="rename">✏️ Rename</button><button data-act="del">🗑️ Hapus</button></div>`;
-    const dot=div.querySelector('.dot-btn'), menu=div.querySelector('.dot-menu');
-    dot.onclick=e=>{e.stopPropagation(); document.querySelectorAll('.dot-menu').forEach(m=>{if(m!==menu)m.classList.remove('open')}); menu.classList.toggle('open');};
-    menu.querySelector('[data-act="del"]').onclick=e=>{e.stopPropagation(); if(confirm('Hapus chat ini?')){delete allChats[id]; if(id===curId){curId=Date.now().toString(); allChats[curId]=[];} save(); load();}};
-    menu.querySelector('[data-act="rename"]').onclick=e=>{
-      e.stopPropagation(); const nn=prompt('Nama baru:',first); if(nn){ allChats[id][0].text=nn; if(allChats[id][0]) allChats[id][0].text=nn; save(); } menu.classList.remove('open');
-    };
-    div.onclick=()=>{curId=id; load(); sidebar.classList.remove('open');};
-    list.appendChild(div);
-  });
-}
-function load(){chatBox.innerHTML='';(allChats[curId]||[]).forEach(m=>add(m.text,m.sender,m.file,false));$('title').innerText=(allChats[curId][0]?.text||'Chat Baru').slice(0,20);save();}
-function add(t,s,f,sv=true){const d=document.createElement('div');d.className='msg '+s;d.textContent=t; if(f) d.innerHTML+=`<img src="${f}">`; chatBox.appendChild(d); chatBox.scrollTop=chatBox.scrollHeight; if(sv){allChats[curId].push({text:t,sender:s,file:f}); save();} return d;}
-renderList(); load();
-$('newChat').onclick=()=>{curId=Date.now().toString(); allChats[curId]=[]; chatBox.innerHTML=''; $('title').innerText='Chat Baru'; save(); sidebar.classList.remove('open');};
-$('clearChat').onclick=()=>{if(confirm('Hapus pesan di chat ini?')){allChats[curId]=[]; chatBox.innerHTML=''; save();}};
-
-// FILE + KIRIM - FIX INPUT MUNCUL
-$('fileIn').onchange=async e=>{
-  const f=e.target.files[0]; if(!f) return;
-  const b64=await new Promise(r=>{const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(f);});
-  selFile={b64:b64.split(',')[1], mime:f.type, prev:b64, name:f.name};
-  $('filePrev').innerHTML=`<img src="${b64}" style="width:50px;border-radius:6px"><span>${f.name}</span><button onclick="this.parentElement.classList.remove('on');selFile=null" style="margin-left:auto;background:#ff4444;border:none;color:#fff;width:22px;height:22px;border-radius:50%">✕</button>`;
-  $('filePrev').classList.add('on');
-};
-$('chatForm').addEventListener('submit', async e=>{
+document.getElementById('clearBtn').onclick=()=>{if(confirm('Hapus chat?')){chats=[];localStorage.removeItem('chats');chatBox.innerHTML='';}};
+document.getElementById('inputBar').addEventListener('submit', async e=>{
   e.preventDefault();
-  if(!user) return $('loginModal').classList.add('on'), alert('Login dulu!');
-  const txt=$('userIn').value.trim(); if(!txt &&!selFile) return;
-  const file=selFile; add(txt,'user',file?.prev,true); $('userIn').value=''; $('filePrev').classList.remove('on'); selFile=null;
-  const loadEl=add('...','bot',null,false);
-  const model=localStorage.getItem('gemini_model')||'gemini-2.0-flash';
-  const parts=[]; if(txt) parts.push({text:txt}); if(file) parts.push({inlineData:{mimeType:file.mime,data:file.b64}});
-  for(let i=0;i<apiKeys.length;i++){
-    try{
-      const key=apiKeys[keyIdx%apiKeys.length];
-      const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
-      const data=await res.json(); loadEl.remove();
-      if(data.candidates){add(data.candidates[0].content.parts[0].text,'bot',null,true); return;} else keyIdx++;
-    }catch{keyIdx++;}
-  }
-  loadEl.remove(); add('❌ Semua API Key limit, tambah key baru di ⚙️','bot',null,true);
+  const key=localStorage.getItem('gemini_key'); if(!key) return alert('Isi API Key di atas dulu!');
+  const txt=userIn.value.trim(); if(!txt) return;
+  add(txt,'user',true); userIn.value='';
+  const load=add('...','bot',false);
+  try{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:txt}]}]})
+    });
+    const data=await res.json(); load.remove();
+    if(data.candidates) add(data.candidates[0].content.parts[0].text,'bot',true);
+    else add('Error: '+JSON.stringify(data).slice(0,200),'bot',true);
+  }catch(err){ load.remove(); add('Error koneksi','bot',true); }
 });
-
-// klik luar nutup menu titik tiga
-document.addEventListener('click',()=>document.querySelectorAll('.dot-menu').forEach(m=>m.classList.remove('open')));
 </script>
 </body>
-  </html>
+</html>
