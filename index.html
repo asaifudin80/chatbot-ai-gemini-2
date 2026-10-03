@@ -87,7 +87,24 @@ body{height:100dvh;display:flex;background:#0f0f0f;overflow:hidden}
 <script>
 const $=id=>document.getElementById(id);
 let user=JSON.parse(localStorage.getItem('user_login')||'null');
-let allChats=JSON.parse(localStorage.getItem('all_chats')||'{}');
+// === RIWAYAT PER AKUN ===
+function getChatKey(){
+  if(!user) return null;
+  return `all_chats_${user.email}`;
+}
+let allChats = {};
+function loadUserChats(){
+  const key = getChatKey();
+  if(!key){ allChats = {}; return; }
+  allChats = JSON.parse(localStorage.getItem(key) || '{}');
+}
+function saveUserChats(){
+  const key = getChatKey();
+  if(!key) return;
+  localStorage.setItem(key, JSON.stringify(allChats));
+  localStorage.setItem('cur_id', cur);
+}
+loadUserChats();
 let cur=localStorage.getItem('cur_id')||Date.now().toString();
 if(!allChats[cur]) allChats[cur]=[];
 let keys=JSON.parse(localStorage.getItem('gemini_keys')||'[]');
