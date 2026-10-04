@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 });
 function openM(id){$(id).style.display='flex'} function closeM(id){$(id).style.display='none'}
 
-// === LOGIN SYSTEM ===
+// ===LOGIN SYSTEM===
 function checkLogin(){
  if(!curUser){ openM('loginM'); $('userInfo').textContent='Belum login'; return false}
  else{ closeM('loginM'); $('userInfo').textContent='👤 '+curUser; $('title').textContent='Hi, '+curUser; renderList(); load(); return true}
