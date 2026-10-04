@@ -22,12 +22,18 @@
 </style></head><body>
 
 <div id="sidebar">
-<div style="padding:12px"><button onclick="newChat()" style="width:100%;padding:10px;border-radius:10px;background:transparent;color:#fff;border:1px solid var(--bdr)">+ New Chat</button></div>
-<div id="list" style="flex:1;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:4px"></div>
-<div style="padding:10px;border-top:1px solid var(--bdr)">
-<div id="userInfo" style="font-size:13px;margin-bottom:8px;opacity:.8"></div>
-<div style="display:flex;gap:8px"><button class="icon" onclick="openM('apiM')">⚙️</button><button class="icon" onclick="logout()" style="margin-left:auto">🚪 Keluar</button></div>
-</div>
+  <div id="sideTop"><b>AI Chat</b><span id="closeSide" style="display:none;cursor:pointer">✕</span></div>
+  <div id="userBox" style="display:none;margin:8px 0;padding:10px;background:#2a2a2a;border-radius:10px;font-size:13px"><span id="uEmail"></span></div>
+  <div id="chatList"></div>
+  <div class="sideBottom">
+    <button id="btnNew">+ Chat Baru</button>
+    <div style="display:flex;gap:8px">
+      <button id="btnLogin" style="flex:1">Login</button>
+      <button id="btnLogout" style="flex:1;display:none">Logout</button>
+      <button id="btnApi">⚙️</button>
+      <button id="openSide" style="display:none">☰</button>
+    </div>
+  </div>
 </div>
 
 <div id="main">
@@ -40,14 +46,13 @@
 </div>
 
 <!-- LOGIN -->
-<div id="loginM" class="modal" style="display:flex;position:fixed;inset:0;background:#000c;align-items:center;justify-content:center;z-index:999">
-  <div class="card" style="background:#2f2f2f;padding:20px;border-radius:12px;width:90%;max-width:320px;display:flex;flex-direction:column;gap:12px">
-    <h3>Login / Daftar</h3>
-    <input id="uInp" placeholder="Username" style="padding:12px;border-radius:8px;border:1px solid #444;background:#1a1a1a;color:#fff">
-    <input id="pInp" type="password" placeholder="Password" style="padding:12px;border-radius:8px;border:1px solid #444;background:#1a1a1a;color:#fff">
-    <button id="loginBtn" style="padding:12px;border-radius:8px;border:none;background:#fff;color:#000;font-weight:bold;cursor:pointer">Masuk</button>
-    <div style="font-size:11px;opacity:.6;text-align:center">Akun baru otomatis dibuat</div>
-</div>
+
+<div id="loginModal" class="modal"><div class="box">
+  <h3>Login Privat</h3><p style="font-size:12px;color:#aaa">Riwayat akan disimpan per email, jadi privat.</p>
+  <input id="loginName" placeholder="Nama (opsional)"><input id="loginEmail" placeholder="Email kamu">
+  <button id="doLogin" style="padding:11px;border:none;border-radius:10px;background:#fff;color:#000;font-weight:700">Masuk</button>
+  <button onclick="document.getElementById('loginModal').classList.remove('on')" style="background:none;border:none;color:#888">Batal</button>
+</div></div>
 <h3>Login / Daftar</h3>
 <input id="uInp" placeholder="Username">
 <input id="pInp" type="password" placeholder="Password">
@@ -106,4 +111,17 @@ function renderList(){
  Object.keys(chats).reverse().forEach(id=>{
   const d=document.createElement('div'); d.className='chatItem'+(id==users[curUser].curId?' active':'');
   d.textContent=(chats[id][0]?.text||'New Chat').slice(0,28);
-</script>
+document.addEventListener('click',()=>document.querySelectorAll('.menu').forEach(m=>m.classList.remove('on')));
+$('btnLogin').onclick=()=>$('loginModal').classList.add('on');
+$('doLogin').onclick=()=>{
+  const e=$('loginEmail').value.trim(); if(!e.includes('@')) return alert('Email salah');
+  user={email:e,name:$('loginName').value.trim()||e.split('@')[0]};
+  localStorage.setItem('user_login',JSON.stringify(user));
+  $('loginModal').classList.remove('on'); refreshUser();
+};
+$('btnLogout').onclick=()=>{
+  if(confirm('Keluar? Riwayat tetap kesimpan untuk email ini.')){
+    localStorage.removeItem('user_login'); user=null; cur=Date.now().toString(); refreshUser();
+  }
+};
+                                      </script>
