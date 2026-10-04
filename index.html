@@ -64,6 +64,14 @@ let keys = JSON.parse(localStorage.getItem('gemini_keys')||'[]');
 let pend=null;
 
 const $=id=>document.getElementById(id);
+  // FIX TOMBOL LOGIN HP
+document.addEventListener('DOMContentLoaded', ()=>{
+  const btn = document.getElementById('loginBtn');
+  if(btn){
+    btn.addEventListener('click', doLogin);
+    btn.addEventListener('touchend', (e)=>{ e.preventDefault(); doLogin(); });
+  }
+});
 function openM(id){$(id).style.display='flex'} function closeM(id){$(id).style.display='none'}
 
 // === LOGIN SYSTEM ===
