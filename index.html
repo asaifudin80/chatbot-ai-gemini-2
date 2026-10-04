@@ -129,7 +129,7 @@ function refreshUser(){
     $('title').innerText='Chat Baru';
   }
 }
-  async function send(){
+  function send(){
   var txt=document.getElementById('msgInp').value.trim();
   if(!txt &&!pend) return;
   if(!user){alert('Login dulu'); openLogin(); return}
