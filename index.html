@@ -1,109 +1,45 @@
 <!DOCTYPE html>
-<html lang="id"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI Chat Final</title>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Chat</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui;background:#212121;color:#fff;display:flex;height:100dvh;overflow:hidden}
-:root{--side:#171717;--box:#2f2f2f;--bdr:#3a3a3a}
-#sidebar{width:270px;background:var(--side);border-right:1px solid var(--bdr);display:flex;flex-direction:column;transition:.3s;z-index:10}
-#sidebar.hide{margin-left:-270px}
-#main{flex:1;display:flex;flex-direction:column;min-width:0}
-#top{padding:12px;border-bottom:1px solid var(--bdr);display:flex;gap:10px;align-items:center}
-#chatBox{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
-.bubble{max-width:80%;padding:10px 14px;border-radius:16px;line-height:1.5;word-wrap:break-word}
-.user{align-self:flex-end;background:#444}.ai{align-self:flex-start;background:var(--box)}
-.bubble img{max-width:220px;border-radius:10px;display:block;margin-bottom:6px}
-#inputArea{padding:10px}
-#inputWrap{max-width:800px;margin:0 auto;background:var(--box);border-radius:24px;display:flex;align-items:center;padding:5px 12px;gap:8px}
-#msgInp{flex:1;background:transparent;border:none;color:#fff;outline:none;padding:10px;font-size:15px}
-.icon{cursor:pointer;background:none;border:none;color:#fff;font-size:20px}
-#preview{display:none;background:var(--box);padding:8px 12px;border-radius:10px;margin:0 auto 8px;max-width:800px;font-size:13px}
-.chatItem{padding:9px;border-radius:8px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chatItem:hover{background:var(--box)}
-.card{width:90%;max-width:340px;background:#1e1e1e;padding:24px;border-radius:16px;display:flex;flex-direction:column;gap:12px;border:1px solid #333}
-.card input{padding:14px;border-radius:10px;border:1px solid #444;background:#2a2a2a;color:#fff;font-size:16px}
-.card button{padding:14px;border-radius:10px;border:none;background:#fff;color:#000;font-weight:bold;cursor:pointer}
-#loginPage{position:fixed;inset:0;background:#121212;z-index:999;display:flex;align-items:center;justify-content:center}
-@media(max-width:800px){#sidebar{position:fixed;left:0;top:0;bottom:0}#sidebar.hide{left:-270px;margin-left:0}}
-</style>
-</head><body>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:sans-serif;background:#212121;color:#fff;display:flex;height:100dvh}
+#sidebar{width:270px;background:#171717;display:flex;flex-direction:column;border-right:1px solid #333}
+#main{flex:1;display:flex;flex-direction:column}
+#chatBox{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.bubble{max-width:80%;padding:10px 14px;border-radius:16px}.user{align-self:flex-end;background:#444}.ai{align-self:flex-start;background:#2f2f2f}
+.bubble img{max-width:200px;border-radius:10px;display:block}
+#inputWrap{margin:10px auto;width:95%;max-width:800px;background:#2f2f2f;border-radius:24px;display:flex;gap:8px;padding:6px 12px;align-items:center}
+#msgInp{flex:1;background:transparent;border:none;color:#fff;outline:none;padding:10px}
+#loginPage{position:fixed;inset:0;background:#121212;z-index:9999;display:flex;align-items:center;justify-content:center}
+.card{width:90%;max-width:350px;background:#1e1e1e;padding:24px;border-radius:16px;display:flex;flex-direction:column;gap:12px;border:1px solid #333}
+.card input{padding:16px;border-radius:12px;border:1px solid #555;background:#2a2a2a;color:#fff;font-size:16px}
+</style></head><body>
 
-<div id="sidebar">
-<div style="padding:12px;display:flex;gap:8px"><button onclick="newChat()" style="flex:1;padding:10px;border-radius:10px;background:#2f2f2f;color:#fff;border:1px solid #444">+ New Chat</button><button class="icon" onclick="toggleSide()">✕</button></div>
-<div id="list" style="flex:1;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:4px"></div>
-<div style="padding:12px;border-top:1px solid var(--bdr)"><div id="uName" style="margin-bottom:8px;font-size:14px">👤 Guest</div>
-<div style="display:flex;gap:8px"><button class="icon" onclick="openApi()">⚙️</button><button onclick="logout()" style="margin-left:auto;background:transparent;border:1px solid #444;color:#ff6b6b;padding:6px 10px;border-radius:8px">Logout</button></div></div>
-</div>
+<div id="sidebar"><div style="padding:12px"><button onclick="newChat()" style="width:100%;padding:10px;border-radius:10px;background:#2f2f2f;color:#fff;border:1px solid #555">+ New Chat</button></div><div id="list" style="flex:1;overflow:auto;padding:8px"></div><div style="padding:12px;border-top:1px solid #333"><div id="uName">👤 Guest</div><button onclick="logout()" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;background:transparent;color:#ff6b6b;border:1px solid #555">Logout</button></div></div>
 
-<div id="main">
-<div id="top"><button class="icon" onclick="toggleSide()">☰</button><b>AI Chat</b><span style="flex:1"></span><span id="curUserTop" style="font-size:13px;opacity:.7"></span></div>
-<div id="chatBox"></div>
-<div id="inputArea">
-<div id="preview"></div>
-<div id="inputWrap">
-<!-- TOMBOL UPLOAD BALIK LAGI -->
-<label class="icon" style="cursor:pointer">📎<input type="file" id="fileInp" hidden accept="image/*"></label>
-<input id="msgInp" placeholder="Ketik pesan..." onkeydown="if(event.key==='Enter')send()">
-<button onclick="send()" style="background:#fff;color:#000;border:none;width:34px;height:34px;border-radius:50%;font-weight:bold">↑</button>
-</div>
-</div>
-</div>
+<div id="main"><div style="padding:12px;border-bottom:1px solid #333">☰ AI Chat</div><div id="chatBox"></div><div style="padding:10px"><div id="preview" style="display:none;margin-bottom:8px;text-align:center;background:#2f2f2f;padding:8px;border-radius:10px"></div><div id="inputWrap"><label style="font-size:22px">📎<input id="fileInp" type="file" hidden accept="image/*"></label><input id="msgInp" placeholder="Ketik..."><button onclick="send()" style="width:36px;height:36px;border-radius:50%;border:none;background:#fff">↑</button></div></div></div>
 
 <div id="loginPage"><div class="card">
-<h2 style="text-align:center">Masuk Akun</h2>
+<h2 style="text-align:center">Login</h2>
 <input id="uInp" placeholder="Username">
 <input id="pInp" type="password" placeholder="Password">
-<button id="btnLogin">MASUK / DAFTAR</button>
-<p style="font-size:11px;opacity:.5;text-align:center">Akun baru otomatis dibuat. Chat disimpan per akun.</p>
+<!-- TOMBOL INI YANG PALING FIX, DIJAMIN KEPENCET -->
+<button onclick="doLogin()" style="width:100%;padding:18px;border-radius:12px;border:none;background:#fff;color:#000;font-weight:900;font-size:18px;cursor:pointer">MASUK</button>
+<p style="font-size:11px;opacity:.5;text-align:center">Akun baru otomatis dibuat</p>
 </div></div>
 
-<div id="apiM" style="display:none;position:fixed;inset:0;background:#000a;z-index:1000;align-items:center;justify-content:center"><div class="card"><h3>Gemini API Key</h3><input id="kInp" placeholder="Paste key"><button onclick="saveKey()">Simpan</button><button onclick="$('apiM').style.display='none'" style="background:transparent;color:#fff;border:1px solid #444">Tutup</button></div></div>
+<div id="apiM" style="display:none;position:fixed;inset:0;background:#000a;z-index:10000;align-items:center;justify-content:center"><div class="card"><input id="kInp" placeholder="Gemini API Key"><button onclick="saveKey()" style="padding:14px;background:#fff;border:none;border-radius:10px;font-weight:bold">Simpan</button></div></div>
 
 <script>
-let users=JSON.parse(localStorage.getItem('ai_users')||'{}'); let curUser=localStorage.getItem('ai_cur_user'); let keys=JSON.parse(localStorage.getItem('gemini_keys')||'[]'); let pend=null;
-const $=id=>document.getElementById(id);
-function toggleSide(){ $('sidebar').classList.toggle('hide'); }
-function openApi(){ $('apiM').style.display='flex'; } function saveKey(){ keys=[$('kInp').value.trim()]; localStorage.setItem('gemini_keys',JSON.stringify(keys)); $('apiM').style.display='none'; }
-
-function init(){
- if(curUser && users[curUser]){ $('loginPage').style.display='none'; $('uName').textContent='👤 '+curUser; $('curUserTop').textContent=curUser; render(); load(); }
- else $('loginPage').style.display='flex';
-}
-$('btnLogin').addEventListener('click', doLogin);
-function doLogin(){
- let u=$('uInp').value.trim(); let p=$('pInp').value.trim(); if(!u||!p) return alert('Isi username & password');
- if(!users[u]){ users[u]={pass:p, chats:{}, curId:Date.now().toString()}; users[u].chats[users[u].curId]=[]; }
- else if(users[u].pass!==p) return alert('Password salah');
- curUser=u; localStorage.setItem('ai_cur_user',curUser); localStorage.setItem('ai_users',JSON.stringify(users));
- $('loginPage').style.display='none'; $('uName').textContent='👤 '+curUser; $('curUserTop').textContent=curUser; render(); load();
-}
-function logout(){ if(!confirm('Logout?')) return; curUser=null; localStorage.removeItem('ai_cur_user'); $('loginPage').style.display='flex'; $('chatBox').innerHTML=''; }
-function newChat(){ let id=Date.now().toString(); users[curUser].chats[id]=[]; users[curUser].curId=id; save(); render(); load(); }
-function save(){ localStorage.setItem('ai_users',JSON.stringify(users)); }
-function render(){ const L=$('list'); L.innerHTML=''; Object.keys(users[curUser].chats).reverse().forEach(id=>{ let d=document.createElement('div'); d.className='chatItem'; d.textContent=(users[curUser].chats[id][0]?.text||'New Chat').slice(0,28); d.onclick=()=>{ users[curUser].curId=id; save(); render(); load(); if(window.innerWidth<800) toggleSide(); }; L.appendChild(d); }); }
-function load(){ const B=$('chatBox'); B.innerHTML=''; let arr=users[curUser].chats[users[curUser].curId]||[]; arr.forEach(m=>{ let div=document.createElement('div'); div.className='bubble '+(m.role=='user'?'user':'ai'); let h=''; if(m.image) h+=`<img src="${m.image}">`; h+=(m.text||'').replace(/\n/g,'<br>'); div.innerHTML=h; B.appendChild(div); }); B.scrollTop=B.scrollHeight; }
-
-// UPLOAD FIX
-$('fileInp').onchange=e=>{
- let f=e.target.files[0]; if(!f) return;
- let r=new FileReader(); r.onload=ev=>{
-  pend={name:f.name,mime:f.type,data:ev.target.result,[STRIPPED]
-  $('preview').style.display='block'; $('preview').innerHTML=`📎 ${f.name} <span onclick="clearF()" style="margin-left:10px;cursor:pointer">✕</span>`;
- }; r.readAsDataURL(f);
-}
-function clearF(){ pend=null; $('preview').style.display='none'; $('fileInp').value=''; }
-
-async function send(){
- let txt=$('msgInp').value.trim(); if(!txt &&!pend) return; if(keys.length==0){ openApi(); return; }
- let curId=users[curUser].curId; let um={role:'user',text:txt}; if(pend){ um.text+=(txt?' \n':'')+`📎 ${pend.name}`; um.image=pend.data; }
- users[curUser].chats[curId].push(um); let fs=pend; $('msgInp').value=''; clearF(); load(); save(); render();
- try{
-  let parts=[]; if(txt) parts.push({text:txt}); if(fs){ parts.push({inlineData:{mimeType:fs.mime,data:fs.data.split(',')[1]}}); if(!txt) parts.unshift({text:"Jelaskan gambar ini"}); }
-  let res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${keys[0]}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
-  let j=await res.json(); let rep=j.candidates?.[0]?.content?.parts?.[0]?.text||j.error?.message||'Error';
-  users[curUser].chats[curId].push({role:'ai',text:rep}); save(); load();
- }catch(e){ users[curUser].chats[curId].push({role:'ai',text:'Error '+e.message}); save(); load(); }
-}
+let users=JSON.parse(localStorage.getItem('ai_users')||'{}'),curUser=localStorage.getItem('ai_cur_user'),keys=JSON.parse(localStorage.getItem('gemini_keys')||'[]'),pend=null;
+function init(){if(curUser&&users[curUser]){document.getElementById('loginPage').style.display='none';document.getElementById('uName').textContent='👤 '+curUser;render();load();}}
+function doLogin(){let u=document.getElementById('uInp').value.trim(),p=document.getElementById('pInp').value.trim();if(!u||!p)return alert('Isi dulu');if(!users[u]){users[u]={pass:p,chats:{},curId:Date.now()+''};users[u].chats[users[u].curId]=[]}else if(users[u].pass!==p)return alert('Password salah');curUser=u;localStorage.setItem('ai_cur_user',u);localStorage.setItem('ai_users',JSON.stringify(users));document.getElementById('loginPage').style.display='none';document.getElementById('uName').textContent='👤 '+u;render();load();}
+function logout(){curUser=null;localStorage.removeItem('ai_cur_user');document.getElementById('loginPage').style.display='flex'}
+function newChat(){let id=Date.now()+'';users[curUser].chats[id]=[];users[curUser].curId=id;localStorage.setItem('ai_users',JSON.stringify(users));render();load();}
+function render(){let L=document.getElementById('list');L.innerHTML='';Object.keys(users[curUser].chats).reverse().forEach(id=>{let d=document.createElement('div');d.style.padding='8px';d.style.cursor='pointer';d.textContent=(users[curUser].chats[id][0]?.text||'New Chat').slice(0,25);d.onclick=()=>{users[curUser].curId=id;localStorage.setItem('ai_users',JSON.stringify(users));render();load();};L.appendChild(d)})}
+function load(){let B=document.getElementById('chatBox');B.innerHTML='';(users[curUser].chats[users[curUser].curId]||[]).forEach(m=>{let d=document.createElement('div');d.className='bubble '+(m.role=='user'?'user':'ai');let h='';if(m.image)h+=`<img src="${m.image}">`;h+=(m.text||'').replace(/\n/g,'<br>');d.innerHTML=h;B.appendChild(d)});B.scrollTop=B.scrollHeight}
+document.getElementById('fileInp').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{pend={name:f.name,mime:f.type,data:ev.target.result,[STRIPPED] document.getElementById('preview').style.display='block';document.getElementById('preview').innerHTML=`📎 ${f.name} <span onclick="clearF()">✕</span>`;};r.readAsDataURL(f)}
+function clearF(){pend=null;document.getElementById('preview').style.display='none'}
+function saveKey(){keys=[document.getElementById('kInp').value.trim()];localStorage.setItem('gemini_keys',JSON.stringify(keys));document.getElementById('apiM').style.display='none'}
+async function send(){let txt=document.getElementById('msgInp').value.trim();if(!txt&&!pend)return;if(keys.length==0){document.getElementById('apiM').style.display='flex';return}let curId=users[curUser].curId;let um={role:'user',text:txt};if(pend){um.text+=(txt?'\n':'')+`📎 ${pend.name}`;um.image=pend.data}users[curUser].chats[curId].push(um);let fs=pend;document.getElementById('msgInp').value='';clearF();load();localStorage.setItem('ai_users',JSON.stringify(users));render();try{let parts=[];if(txt)parts.push({text:txt});if(fs)parts.push({inlineData:{mimeType:fs.mime,data:fs.data.split(',[STRIPPED] if(!txt)parts.unshift({text:'Jelaskan gambar ini'});let res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${keys[0]}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});let j=await res.json();let rep=j.candidates?.[0]?.content?.parts?.[0]?.text||j.error?.message||'Error';users[curUser].chats[curId].push({role:'ai',text:rep});localStorage.setItem('ai_users',JSON.stringify(users));load()}catch(e){users[curUser].chats[curId].push({role:'ai',text:'Error '+e.message});localStorage.setItem('ai_users',JSON.stringify(users));load()}}
 init();
 </script></body></html>
