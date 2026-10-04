@@ -131,13 +131,30 @@ function refreshUser(){
 }
 function save(){ saveUserChats(); render(); }
 function load(){
-  const box=$('chatBox'); box.innerHTML='';
-  (allChats[cur]||[]).forEach(m=>{
-    const d=document.createElement('div'); d.className='msg '+(m.role==='user'?'user':'ai'); d.innerText=m.text; box.appendChild(d);
+  var box=document.getElementById('chatBox'); box.innerHTML='';
+  (allChats[cur]||[]).forEach(function(m){
+    var d=document.createElement('div');
+    d.style.padding='10px'; d.style.marginBottom='8px'; d.style.borderRadius='12px'; d.style.maxWidth='85%'; d.style.wordBreak='break-word'; d.style.whiteSpace='pre-wrap';
+    if(m.role=='user'){d.style.alignSelf='flex-end'; d.style.background='#333'; d.style.marginLeft='auto';}else{d.style.background='#222'; d.style.border='1px solid #333';}
+
+    // render link otomatis jadi bisa diklik
+    var text = m.text;
+    // ubah http:// jadi <a>
+    text = text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#4da6ff;text-decoration:underline">$1</a>');
+    // ubah [DOWNLOAD: namafile | data] jadi tombol download
+    text = text.replace(/\[FILE:(.*?)\|(.*?)\]/g, '<br><a href="$2" download="$1" style="display:inline-block;margin-top:8px;padding:8px 12px;background:#fff;color:#000;border-radius:8px;text-decoration:none;font-weight:700">📥 Download $1</a>');
+
+    if(m.image){
+      d.innerHTML = text;
+      var im=document.createElement('img'); im.src=m.image; im.style.maxWidth='100%'; im.style.marginTop='8px'; im.style.borderRadius='8px'; d.appendChild(im);
+    } else {
+      d.innerHTML = text;
+    }
+    box.appendChild(d);
   });
-  $('title').innerText=(allChats[cur]?.[0]?.text||'Chat Baru').slice(0,28);
+  document.getElementById('title').innerText=((allChats[cur]||[])[0]?.text||'Chat Baru').slice(0,20);
   box.scrollTop=box.scrollHeight;
-}
+  }
 function render(){
   if(!user) return;
   const list=$('chatList'); list.innerHTML='';
