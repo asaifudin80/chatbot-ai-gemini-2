@@ -130,68 +130,62 @@ function refreshUser(){
   }
 }
   async function send(){
-  var txt=document.getElementById('msgInp').value.trim();
+  var inp = document.getElementById('msgInp');
+  var txt = inp.value.trim();
   if(!txt &&!pend) return;
-  if(!user){alert('Login dulu'); openLogin(); return}
-  if(keys.length==0){alert('Set API Key di ⚙️'); openApi(); return}
+  if(!user){alert('Login dulu'); openM('loginM'); return}
+  if(keys.length==0){alert('Set API Key di ⚙️'); openM('apiM'); return}
   if(!allChats[cur]) allChats[cur]=[];
 
-  // simpan ke chat dengan preview
-  var um={role:'user', text: txt + (pend? '\n📎 '+pend.name : '')};
+  // ini biar file muncul di kotak chat
+  var um = {role:'user', text: txt || (pend? '📎 '+pend.name : '')};
   if(pend && pend.isImage) um.image = pend.data;
   allChats[cur].push(um);
 
-  document.getElementById('msgInp').value='';
-  var fs = pend; // simpan file yang mau dikirim ke AI
+  inp.value='';
+  var fs = pend; // simpan dulu sebelum dihapus
   clearF();
-  load(); save();
+  load(); saveChats(); render();
 
   var model=localStorage.getItem('gemini_model')||'gemini-2.0-flash';
   try{
     var parts=[];
     if(txt) parts.push({text: txt});
-
-    if(fs){
-      // kalau ada file, kirim sebagai base64
+    if(fs && fs.isImage){
       var base64 = fs.data.split(',')[1];
-      if(fs.isImage || fs.mime.startsWith('image/')){
-        parts.push({inlineData: {mimeType: fs.mime, data: base64}});
-        if(!txt) parts.unshift({text: "Jelaskan gambar ini"});
-      } else {
-        // kalau file biasa (pdf/doc), kirim sebagai teks
-        parts.push({text: "\n[File: "+fs.name+" terupload, tolong analisis isinya]"});
-      }
+      parts.push({inlineData:{mimeType:fs.mime, data: base64}});
+      if(!txt) parts.unshift({text:"Tolong jelaskan gambar ini secara detail"});
     }
-
-    if(parts.length==0) parts.push({text: "Halo"});
+    if(parts.length==0) parts.push({text:"Halo"});
 
     var res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+keys[0],{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts: parts}]})
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:parts}]})
     });
-
     var data=await res.json();
-    console.log(data); // buat debug
-    var rep=data.candidates?.[0]?.content?.parts?.[0]?.text || 'Error: '+(data.error?.message||'gagal baca file, coba model 2.0-flash');
+    console.log('AI:', data);
+    var rep=data.candidates?.[0]?.content?.parts?.[0]?.text || 'Error: '+(data.error?.message||'gagal baca gambar, ganti model ke 2.0-flash');
     allChats[cur].push({role:'ai', text: rep});
-    save(); load();
+    saveChats(); load();
   }catch(e){
     allChats[cur].push({role:'ai', text:'Error '+e.message});
-    save(); load();
+    saveChats(); load();
   }
   }
 function save(){ saveUserChats(); render(); }
 function load(){
   var b=document.getElementById('chatBox');
-  b.innerHTML=''; // kosongin layar dulu
+  b.innerHTML='';
   (allChats[cur]||[]).forEach(m=>{
     var div=document.createElement('div');
-    div.className='bubble '+m.role; // user atau ai
-    div.innerHTML=m.text;
-    b.appendChild(div); // tempel ke layar
+    div.className='bubble '+m.role;
+    var isi = '';
+    if(m.image) isi += '<img src="'+m.image+'" style="max-width:200px;border-radius:8px;display:block;margin-bottom:5px">';
+    isi += (m.text||'').replace(/\n/g,'<br>');
+    div.innerHTML = isi;
+    b.appendChild(div);
   });
-  b.scrollTop=b.scrollHeight // auto scroll ke bawah
+  b.scrollTop=b.scrollHeight;
   }
 function render(){
   if(!user) return;
