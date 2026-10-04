@@ -1,170 +1,93 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Chat - Like ChatGPT</title>
-<style>
-/* === CSS UTAMA === */
-:root{ --bg:#212121; --side:#171717; --bubble-ai:#2f2f2f; --bubble-user:#444; --border:#3a3a3a; }
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,sans-serif;background:var(--bg);color:#fff;display:flex;height:100dvh;overflow:hidden}
-
-/* Sidebar */
-#sidebar{width:260px;background:var(--side);display:flex;flex-direction:column;border-right:1px solid var(--border)}
-#sideTop{padding:12px}
-#newBtn{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:#fff;cursor:pointer}
-#chatList{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:4px}
-.chatItem{padding:10px;border-radius:8px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chatItem:hover,.chatItem.active{background:#2f2f2f}
-
-/* Main */
-#main{flex:1;display:flex;flex-direction:column;position:relative}
-#topbar{padding:12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-#chatBox{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;max-width:800px;width:100%;margin:0 auto}
-.bubble{max-width:85%;padding:12px 16px;border-radius:18px;line-height:1.5;word-wrap:break-word}
-.bubble.user{align-self:flex-end;background:var(--bubble-user);border-bottom-right-radius:4px}
-.bubble.ai{align-self:flex-start;background:var(--bubble-ai);border-bottom-left-radius:4px}
-.bubble img{max-width:220px;border-radius:10px;margin-bottom:8px;display:block}
-
-/* Input Area */
-#inputArea{padding:16px;max-width:800px;width:100%;margin:0 auto}
-#inputWrap{background:#2f2f2f;border-radius:24px;display:flex;align-items:center;padding:6px 12px;gap:8px}
-#msgInp{flex:1;background:transparent;border:none;color:#fff;outline:none;padding:10px;font-size:15px}
-.iconBtn{background:transparent;border:none;color:#aaa;font-size:20px;cursor:pointer}
-#sendBtn{background:#fff;color:#000;width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;font-weight:bold}
-#preview{display:none;padding:8px 16px;background:#2f2f2f;margin-bottom:10px;border-radius:12px;font-size:13px}
-
-/* Mobile */
-@media(max-width:700px){#sidebar{position:fixed;left:-260px;top:0;bottom:0;z-index:99;transition:0.3s}#sidebar.open{left:0}}
-</style>
-</head>
-<body>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Chat - Akun</title><style>
+:root{--bg:#212121;--side:#171717;--bdr:#3a3a3a;--box:#2f2f2f}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui;background:var(--bg);color:#fff;display:flex;height:100dvh;overflow:hidden}
+#sidebar{width:260px;background:var(--side);border-right:1px solid var(--bdr);display:flex;flex-direction:column}
+#main{flex:1;display:flex;flex-direction:column}
+#chatBox{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;max-width:800px;width:100%;margin:0 auto}
+.bubble{max-width:85%;padding:12px 16px;border-radius:18px;line-height:1.5}
+.user{align-self:flex-end;background:#444}.ai{align-self:flex-start;background:var(--box)}
+.bubble img{max-width:200px;border-radius:10px;display:block;margin-bottom:6px}
+#inputWrap{background:var(--box);border-radius:24px;display:flex;align-items:center;padding:6px 12px;gap:8px;max-width:800px;width:100%;margin:0 auto 16px}
+#msgInp{flex:1;background:transparent;border:none;color:#fff;outline:none;padding:10px}
+.icon{cursor:pointer;background:none;border:none;color:#aaa;font-size:20px}
+.modal{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;z-index:99}
+.card{background:var(--box);padding:20px;border-radius:12px;width:320px;display:flex;flex-direction:column;gap:10px}
+.card input{padding:10px;border-radius:8px;border:1px solid var(--bdr);background:#1a1a1a;color:#fff}
+.card button{padding:10px;border-radius:8px;border:none;background:#fff;color:#000;cursor:pointer;font-weight:bold}
+.chatItem{padding:10px;border-radius:8px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chatItem:hover{background:var(--box)}.active{background:var(--box)}
+@media(max-width:700px){#sidebar{position:fixed;left:-260px;top:0;bottom:0;z-index:50;transition:.3s}#sidebar.open{left:0}}
+</style></head><body>
 
 <div id="sidebar">
-  <div id="sideTop"><button id="newBtn" onclick="newChat()">+ New Chat</button></div>
-  <div id="chatList"></div>
-  <div style="padding:10px;border-top:1px solid var(--border);display:flex;gap:8px">
-    <button class="iconBtn" onclick="openM('loginM')">👤</button>
-    <button class="iconBtn" onclick="openM('apiM')">⚙️</button>
-    <button class="iconBtn" onclick="exportChat()" style="margin-left:auto">⬇️</button>
-  </div>
+<div style="padding:12px"><button onclick="newChat()" style="width:100%;padding:10px;border-radius:10px;background:transparent;color:#fff;border:1px solid var(--bdr)">+ New Chat</button></div>
+<div id="list" style="flex:1;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:4px"></div>
+<div style="padding:10px;border-top:1px solid var(--bdr)">
+<div id="userInfo" style="font-size:13px;margin-bottom:8px;opacity:.8"></div>
+<div style="display:flex;gap:8px"><button class="icon" onclick="openM('apiM')">⚙️</button><button class="icon" onclick="logout()" style="margin-left:auto">🚪 Keluar</button></div>
+</div>
 </div>
 
 <div id="main">
-  <div id="topbar">
-    <button class="iconBtn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-    <b>AI Chat</b><span></span>
-  </div>
-  <div id="chatBox"></div>
-  <div id="inputArea">
-    <div id="preview"></div>
-    <div id="inputWrap">
-      <label class="iconBtn" style="cursor:pointer">📎<input type="file" id="fileInp" hidden accept="image/*"></label>
-      <input id="msgInp" placeholder="Message AI..." onkeydown="if(event.key==='Enter') send()">
-      <button id="sendBtn" onclick="send()">↑</button>
-    </div>
-  </div>
+<div style="padding:12px;border-bottom:1px solid var(--bdr);display:flex;gap:10px"><button class="icon" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button><b id="title">AI Chat</b></div>
+<div id="chatBox"></div>
+<div style="padding:12px">
+<div id="preview" style="display:none;background:var(--box);padding:8px 12px;border-radius:12px;margin-bottom:8px;font-size:13px"></div>
+<div id="inputWrap"><label class="icon">📎<input type="file" id="fileInp" hidden accept="image/*"></label><input id="msgInp" placeholder="Message..." onkeydown="if(event.key==='Enter')send()"><button onclick="send()" style="background:#fff;color:#000;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer">↑</button></div>
+</div>
 </div>
 
-<!-- Modals -->
-<div id="loginM" style="display:none;position:fixed;inset:0;background:#000a;align-items:center;justify-content:center;z-index:100"><div style="background:#2f2f2f;padding:20px;border-radius:12px;display:flex;gap:8px"><input id="uInp" placeholder="Username"><button onclick="login()">OK</button></div></div>
-<div id="apiM" style="display:none;position:fixed;inset:0;background:#000a;align-items:center;justify-content:center;z-index:100"><div style="background:#2f2f2f;padding:20px;border-radius:12px;display:flex;flex-direction:column;gap:8px"><input id="kInp" placeholder="Gemini API Key" style="width:300px"><button onclick="saveKey()">Save</button></div></div>
+<!-- LOGIN -->
+<div id="loginM" class="modal" style="display:flex"><div class="card">
+<h3>Login / Daftar</h3>
+<input id="uInp" placeholder="Username">
+<input id="pInp" type="password" placeholder="Password">
+<button onclick="doLogin()">Masuk</button>
+<div style="font-size:12px;opacity:.6">Akun baru otomatis dibuat kalau username belum ada. Chat tersimpan per akun.</div>
+</div></div>
+
+<div id="apiM" class="modal"><div class="card"><h3>API Key Gemini</h3><input id="kInp" placeholder="Paste API Key"><button onclick="saveKey()">Simpan</button><button onclick="closeM('apiM')" style="background:transparent;color:#fff;border:1px solid var(--bdr)">Tutup</button></div></div>
 
 <script>
-// === JS UTAMA ===
-let user=localStorage.getItem('ai_user');
-let keys=JSON.parse(localStorage.getItem('gemini_keys')||'[]');
-let allChats=JSON.parse(localStorage.getItem('all_chats')||'{}');
-let cur=localStorage.getItem('cur_chat')||Date.now().toString();
+let curUser = localStorage.getItem('ai_cur_user');
+let users = JSON.parse(localStorage.getItem('ai_users')||'{}'); // {username:{pass, chats:{}, curId}}
+let keys = JSON.parse(localStorage.getItem('gemini_keys')||'[]');
 let pend=null;
 
-const $ = id=>document.getElementById(id);
-function openM(id){$(id).style.display='flex'}
-function closeM(id){$(id).style.display='none'}
-function login(){user=$('uInp').value; localStorage.setItem('ai_user',user); closeM('loginM')}
-function saveKey(){keys=[$('kInp').value.trim()]; localStorage.setItem('gemini_keys',JSON.stringify(keys)); closeM('apiM')}
+const $=id=>document.getElementById(id);
+function openM(id){$(id).style.display='flex'} function closeM(id){$(id).style.display='none'}
 
-function newChat(){cur=Date.now().toString(); allChats[cur]=[]; save(); renderList(); load()}
-function save(){localStorage.setItem('all_chats',JSON.stringify(allChats)); localStorage.setItem('cur_chat',cur)}
+// === LOGIN SYSTEM ===
+function checkLogin(){
+ if(!curUser){ openM('loginM'); $('userInfo').textContent='Belum login'; return false}
+ else{ closeM('loginM'); $('userInfo').textContent='👤 '+curUser; $('title').textContent='Hi, '+curUser; renderList(); load(); return true}
+}
+function doLogin(){
+ let u=$('uInp').value.trim(); let p=$('pInp').value.trim();
+ if(!u||!p) return alert('Isi username & password');
+ if(!users[u]){ // daftar baru
+   users[u]={pass:p, chats:{}, curId:Date.now().toString()}; users[u].chats[users[u].curId]=[];
+ }else{ if(users[u].pass!==p) return alert('Password salah'); }
+ curUser=u; localStorage.setItem('ai_cur_user',curUser);
+ localStorage.setItem('ai_users',JSON.stringify(users));
+ checkLogin();
+}
+function logout(){
+ if(!confirm('Keluar dari akun '+curUser+'?')) return;
+ curUser=null; localStorage.removeItem('ai_cur_user'); $('chatBox').innerHTML=''; $('list').innerHTML=''; openM('loginM');
+}
+function saveData(){ if(!curUser) return; localStorage.setItem('ai_users',JSON.stringify(users)); localStorage.setItem('gemini_keys',JSON.stringify(keys)); }
+function getCurData(){ return users[curUser]; }
 
+// === CHAT PER AKUN ===
+function newChat(){
+ if(!checkLogin()) return;
+ let id=Date.now().toString(); users[curUser].chats[id]=[]; users[curUser].curId=id; saveData(); renderList(); load();
+}
 function renderList(){
-  const list=$('chatList'); list.innerHTML='';
-  Object.keys(allChats).reverse().forEach(id=>{
-    const d=document.createElement('div'); d.className='chatItem'+(id==cur?' active':'');
-    d.textContent=(allChats[id][0]?.text||'New Chat').slice(0,30);
-    d.onclick=()=>{cur=id; save(); renderList(); load(); document.getElementById('sidebar').classList.remove('open')};
-    list.appendChild(d);
-  })
-}
-
-function load(){
-  const box=$('chatBox'); box.innerHTML='';
-  (allChats[cur]||[]).forEach(m=>{
-    const div=document.createElement('div'); div.className='bubble '+m.role;
-    let html='';
-    if(m.image) html+=`<img src="${m.image}">`;
-    html+= (m.text||'').replace(/\n/g,'<br>');
-    div.innerHTML=html; box.appendChild(div);
-  });
-  box.scrollTop=box.scrollHeight;
-}
-
-// Upload file
-$('fileInp').onchange=e=>{
-  const f=e.target.files[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=ev=>{
-    pend={name:f.name,mime:f.type,data:ev.target.result,isImage:true};
-    const p=$('preview'); p.style.display='block';
-    p.innerHTML=`📎 ${f.name} <span onclick="clearF()" style="cursor:pointer;margin-left:10px">✕</span>`;
-  };
-  r.readAsDataURL(f);
-}
-function clearF(){pend=null; $('preview').style.display='none'; $('fileInp').value='';}
-
-// Fungsi SEND yang bener (bisa kirim gambar)
-async function send(){
-  const txt=$('msgInp').value.trim();
-  if(!txt &&!pend) return;
-  if(!user){openM('loginM'); return}
-  if(keys.length==0){openM('apiM'); return}
-  if(!allChats[cur]) allChats[cur]=[];
-
-  const um={role:'user', text: txt || ''};
-  if(pend) { um.text += (txt?'':'') + `\n📎 ${pend.name}`; um.image=pend.data; }
-  allChats[cur].push(um);
-  $('msgInp').value=''; const fs=pend; clearF();
-  load(); save(); renderList();
-
-  try{
-    let parts=[]; if(txt) parts.push({text:txt});
-    if(fs){
-      const b64=fs.data.split(',')[1];
-      parts.push({inlineData:{mimeType:fs.mime,data:b64}});
-      if(!txt) parts.unshift({text:"Jelaskan gambar ini"});
-    }
-    if(parts.length==0) return;
-    const model=localStorage.getItem('gemini_model')||'gemini-2.0-flash';
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${keys[0]}`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts}]})
-    });
-    const data=await res.json();
-    const rep=data.candidates?.[0]?.content?.parts?.[0]?.text || `Error: ${data.error?.message||'gagal'}`;
-    allChats[cur].push({role:'ai', text: rep});
-    save(); load();
-  }catch(e){
-    allChats[cur].push({role:'ai', text:'Error: '+e.message}); save(); load();
-  }
-}
-
-function exportChat(){
-  const txt=(allChats[cur]||[]).map(m=>`${m.role}: ${m.text}`).join('\n\n');
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt])); a.download='chat.txt'; a.click();
-}
-
-renderList(); load();
-</script>
-</body>
-</html>
+ if(!curUser) return; const list=$('list'); list.innerHTML=''; const chats=users[curUser].chats;
+ Object.keys(chats).reverse().forEach(id=>{
+  const d=document.createElement('div'); d.className='chatItem'+(id==users[curUser].curId?' active':'');
+  d.textContent=(chats[id][0]?.text||'New Chat').slice(0,28);
