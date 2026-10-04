@@ -106,3 +106,4 @@ function renderList(){
  Object.keys(chats).reverse().forEach(id=>{
   const d=document.createElement('div'); d.className='chatItem'+(id==users[curUser].curId?' active':'');
   d.textContent=(chats[id][0]?.text||'New Chat').slice(0,28);
+</script>
