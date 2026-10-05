@@ -2,137 +2,169 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI Chat - Full Version</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Chat - Like ChatGPT</title>
 <style>
+/* === CSS UTAMA === */
+:root{ --bg:#212121; --side:#171717; --bubble-ai:#2f2f2f; --bubble-user:#444; --border:#3a3a3a; }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,sans-serif;background:#212121;color:#fff;display:flex;height:100dvh;overflow:hidden}
-#sidebar{width:270px;background:#171717;border-right:1px solid #333;display:flex;flex-direction:column;transition:.3s}
-#sidebar.hide{transform:translateX(-100%);position:fixed;z-index:20;left:0;top:0;bottom:0}
-#main{flex:1;display:flex;flex-direction:column;min-width:0}
-#top{padding:12px 14px;border-bottom:1px solid #333;display:flex;gap:10px;align-items:center}
-#chatBox{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px}
-.bubble{max-width:80%;padding:11px 14px;border-radius:18px;line-height:1.5;word-break:break-word}
-.user{align-self:flex-end;background:#444}
-.ai{align-self:flex-start;background:#2f2f2f}
-.bubble img{max-width:230px;border-radius:10px;display:block;margin-bottom:6px}
-#inputArea{padding:10px}
-#inputWrap{max-width:800px;margin:0 auto;background:#2f2f2f;border-radius:24px;display:flex;align-items:center;padding:6px 12px;gap:8px}
-#msgInp{flex:1;background:transparent;border:none;color:#fff;outline:none;padding:10px;font-size:16px}
-#preview{display:none;max-width:800px;margin:0 auto 8px;background:#2f2f2f;padding:8px 12px;border-radius:10px;font-size:13px}
-.chatItem{padding:9px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chatItem:hover{background:#2f2f2f}
-.icon{background:none;border:none;color:#fff;font-size:20px;cursor:pointer}
-#loginPage{position:fixed;inset:0;background:#0f0f0f;z-index:9999;display:flex;align-items:center;justify-content:center}
-.card{width:92%;max-width:360px;background:#1e1e1e;padding:26px;border-radius:18px;display:flex;flex-direction:column;gap:14px;border:1px solid #333}
-.card input{padding:16px;border-radius:12px;border:1px solid #444;background:#2a2a2a;color:#fff;font-size:16px;outline:none}
-#btnLogin{padding:18px;border-radius:12px;border:none;background:#fff;color:#000;font-weight:900;font-size:18px;cursor:pointer;width:100%}
-#apiM{display:none;position:fixed;inset:0;background:#000c;z-index:10000;align-items:center;justify-content:center}
+body{font-family:system-ui,sans-serif;background:var(--bg);color:#fff;display:flex;height:100dvh;overflow:hidden}
+
+/* Sidebar */
+#sidebar{width:260px;background:var(--side);display:flex;flex-direction:column;border-right:1px solid var(--border)}
+#sideTop{padding:12px}
+#newBtn{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:#fff;cursor:pointer}
+#chatList{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:4px}
+.chatItem{padding:10px;border-radius:8px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chatItem:hover,.chatItem.active{background:#2f2f2f}
+
+/* Main */
+#main{flex:1;display:flex;flex-direction:column;position:relative}
+#topbar{padding:12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+#chatBox{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;max-width:800px;width:100%;margin:0 auto}
+.bubble{max-width:85%;padding:12px 16px;border-radius:18px;line-height:1.5;word-wrap:break-word}
+.bubble.user{align-self:flex-end;background:var(--bubble-user);border-bottom-right-radius:4px}
+.bubble.ai{align-self:flex-start;background:var(--bubble-ai);border-bottom-left-radius:4px}
+.bubble img{max-width:220px;border-radius:10px;margin-bottom:8px;display:block}
+
+/* Input Area */
+#inputArea{padding:16px;max-width:800px;width:100%;margin:0 auto}
+#inputWrap{background:#2f2f2f;border-radius:24px;display:flex;align-items:center;padding:6px 12px;gap:8px}
+#msgInp{flex:1;background:transparent;border:none;color:#fff;outline:none;padding:10px;font-size:15px}
+.iconBtn{background:transparent;border:none;color:#aaa;font-size:20px;cursor:pointer}
+#sendBtn{background:#fff;color:#000;width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;font-weight:bold}
+#preview{display:none;padding:8px 16px;background:#2f2f2f;margin-bottom:10px;border-radius:12px;font-size:13px}
+
+/* Mobile */
+@media(max-width:700px){#sidebar{position:fixed;left:-260px;top:0;bottom:0;z-index:99;transition:0.3s}#sidebar.open{left:0}}
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <div id="sidebar">
-  <div style="padding:12px;display:flex;gap:8px">
-    <button onclick="newChat()" style="flex:1;padding:10px;border-radius:10px;background:#2f2f2f;color:#fff;border:1px solid #444;cursor:pointer">+ New Chat</button>
-    <button class="icon" onclick="toggleSide()">✕</button>
-  </div>
-  <div id="list" style="flex:1;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:4px"></div>
-  <div style="padding:12px;border-top:1px solid #333">
-    <div id="uName" style="font-size:14px;margin-bottom:8px">👤 Guest</div>
-    <div style="display:flex;gap:8px">
-      <button class="icon" onclick="openApi()">⚙️</button>
-      <button onclick="logout()" style="margin-left:auto;background:transparent;border:1px solid #444;color:#ff6b6b;padding:6px 12px;border-radius:8px;cursor:pointer">Logout</button>
-    </div>
+  <div id="sideTop"><button id="newBtn" onclick="newChat()">+ New Chat</button></div>
+  <div id="chatList"></div>
+  <div style="padding:10px;border-top:1px solid var(--border);display:flex;gap:8px">
+    <button class="iconBtn" onclick="openM('loginM')">👤</button>
+    <button class="iconBtn" onclick="openM('apiM')">⚙️</button>
+    <button class="iconBtn" onclick="exportChat()" style="margin-left:auto">⬇️</button>
   </div>
 </div>
 
-<!-- MAIN -->
 <div id="main">
-  <div id="top">
-    <button class="icon" onclick="toggleSide()">☰</button>
-    <b>AI Chat</b>
-    <span style="flex:1"></span>
-    <span id="curTop" style="font-size:12px;opacity:.6"></span>
+  <div id="topbar">
+    <button class="iconBtn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+    <b>AI Chat</b><span></span>
   </div>
   <div id="chatBox"></div>
   <div id="inputArea">
     <div id="preview"></div>
     <div id="inputWrap">
-      <label class="icon" style="cursor:pointer">📎<input id="fileInp" type="file" hidden accept="image/*"></label>
-      <input id="msgInp" placeholder="Ketik pesan atau upload gambar..." onkeydown="if(event.key==='Enter')send()">
-      <button onclick="send()" style="background:#fff;color:#000;border:none;width:36px;height:36px;border-radius:50%;font-weight:bold;cursor:pointer">↑</button>
+      <label class="iconBtn" style="cursor:pointer">📎<input type="file" id="fileInp" hidden accept="image/*"></label>
+      <input id="msgInp" placeholder="Message AI..." onkeydown="if(event.key==='Enter') send()">
+      <button id="sendBtn" onclick="send()">↑</button>
     </div>
   </div>
 </div>
 
-<!-- LOGIN -->
-<div id="loginPage">
-  <div class="card">
-    <h2 style="text-align:center">Masuk Akun</h2>
-    <input id="uInp" placeholder="Username">
-    <input id="pInp" type="password" placeholder="Password">
-    <button id="btnLogin" onclick="doLogin()">MASUK</button>
-    <p style="font-size:11px;opacity:.5;text-align:center">Username baru = otomatis daftar<br>Chat tersimpan per akun</p>
-  </div>
-</div>
-
-<!-- API KEY -->
-<div id="apiM">
-  <div class="card">
-    <h3>API Key Gemini</h3>
-    <input id="kInp" placeholder="Paste API Key Gemini">
-    <button onclick="saveKey()" style="padding:14px;border-radius:10px;border:none;background:#fff;color:#000;font-weight:bold;cursor:pointer">Simpan</button>
-    <button onclick="document.getElementById('apiM').style.display='none'" style="padding:12px;border-radius:10px;background:transparent;color:#fff;border:1px solid #444;cursor:pointer">Tutup</button>
-  </div>
-</div>
+<!-- Modals -->
+<div id="loginM" style="display:none;position:fixed;inset:0;background:#000a;align-items:center;justify-content:center;z-index:100"><div style="background:#2f2f2f;padding:20px;border-radius:12px;display:flex;gap:8px"><input id="uInp" placeholder="Username"><button onclick="login()">OK</button></div></div>
+<div id="apiM" style="display:none;position:fixed;inset:0;background:#000a;align-items:center;justify-content:center;z-index:100"><div style="background:#2f2f2f;padding:20px;border-radius:12px;display:flex;flex-direction:column;gap:8px"><input id="kInp" placeholder="Gemini API Key" style="width:300px"><button onclick="saveKey()">Save</button></div></div>
 
 <script>
-let users=JSON.parse(localStorage.getItem('ai_users')||'{}');
-let curUser=localStorage.getItem('ai_cur_user');
+// === JS UTAMA ===
+let user=localStorage.getItem('ai_user');
 let keys=JSON.parse(localStorage.getItem('gemini_keys')||'[]');
+let allChats=JSON.parse(localStorage.getItem('all_chats')||'{}');
+let cur=localStorage.getItem('cur_chat')||Date.now().toString();
 let pend=null;
-const $=id=>document.getElementById(id);
-function toggleSide(){ $('sidebar').classList.toggle('hide'); }
-function openApi(){ $('apiM').style.display='flex'; }
-function saveKey(){ keys=[$('kInp').value.trim()]; localStorage.setItem('gemini_keys',JSON.stringify(keys)); $('apiM').style.display='none'; }
-function init(){
-  if(curUser && users[curUser]){
-    $('loginPage').style.display='none';
-    $('uName').textContent='👤 '+curUser;
-    $('curTop').textContent=curUser;
-    render(); load();
+
+const $ = id=>document.getElementById(id);
+function openM(id){$(id).style.display='flex'}
+function closeM(id){$(id).style.display='none'}
+function login(){user=$('uInp').value; localStorage.setItem('ai_user',user); closeM('loginM')}
+function saveKey(){keys=[$('kInp').value.trim()]; localStorage.setItem('gemini_keys',JSON.stringify(keys)); closeM('apiM')}
+
+function newChat(){cur=Date.now().toString(); allChats[cur]=[]; save(); renderList(); load()}
+function save(){localStorage.setItem('all_chats',JSON.stringify(allChats)); localStorage.setItem('cur_chat',cur)}
+
+function renderList(){
+  const list=$('chatList'); list.innerHTML='';
+  Object.keys(allChats).reverse().forEach(id=>{
+    const d=document.createElement('div'); d.className='chatItem'+(id==cur?' active':'');
+    d.textContent=(allChats[id][0]?.text||'New Chat').slice(0,30);
+    d.onclick=()=>{cur=id; save(); renderList(); load(); document.getElementById('sidebar').classList.remove('open')};
+    list.appendChild(d);
+  })
+}
+
+function load(){
+  const box=$('chatBox'); box.innerHTML='';
+  (allChats[cur]||[]).forEach(m=>{
+    const div=document.createElement('div'); div.className='bubble '+m.role;
+    let html='';
+    if(m.image) html+=`<img src="${m.image}">`;
+    html+= (m.text||'').replace(/\n/g,'<br>');
+    div.innerHTML=html; box.appendChild(div);
+  });
+  box.scrollTop=box.scrollHeight;
+}
+
+// Upload file
+$('fileInp').onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    pend={name:f.name,mime:f.type,data:ev.target.result,isImage:true};
+    const p=$('preview'); p.style.display='block';
+    p.innerHTML=`📎 ${f.name} <span onclick="clearF()" style="cursor:pointer;margin-left:10px">✕</span>`;
+  };
+  r.readAsDataURL(f);
+}
+function clearF(){pend=null; $('preview').style.display='none'; $('fileInp').value='';}
+
+// Fungsi SEND yang bener (bisa kirim gambar)
+async function send(){
+  const txt=$('msgInp').value.trim();
+  if(!txt &&!pend) return;
+  if(!user){openM('loginM'); return}
+  if(keys.length==0){openM('apiM'); return}
+  if(!allChats[cur]) allChats[cur]=[];
+
+  const um={role:'user', text: txt || ''};
+  if(pend) { um.text += (txt?'':'') + `\n📎 ${pend.name}`; um.image=pend.data; }
+  allChats[cur].push(um);
+  $('msgInp').value=''; const fs=pend; clearF();
+  load(); save(); renderList();
+
+  try{
+    let parts=[]; if(txt) parts.push({text:txt});
+    if(fs){
+      const b64=fs.data.split(',')[1];
+      parts.push({inlineData:{mimeType:fs.mime,data:b64}});
+      if(!txt) parts.unshift({text:"Jelaskan gambar ini"});
+    }
+    if(parts.length==0) return;
+    const model=localStorage.getItem('gemini_model')||'gemini-2.0-flash';
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${keys[0]}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts}]})
+    });
+    const data=await res.json();
+    const rep=data.candidates?.[0]?.content?.parts?.[0]?.text || `Error: ${data.error?.message||'gagal'}`;
+    allChats[cur].push({role:'ai', text: rep});
+    save(); load();
+  }catch(e){
+    allChats[cur].push({role:'ai', text:'Error: '+e.message}); save(); load();
   }
 }
-function doLogin(){
-  let u=$('uInp').value.trim(), p=$('pInp').value.trim();
-  if(!u||!p) return alert('Isi username & password dulu');
-  if(!users[u]){ users[u]={pass:p,chats:{},curId:Date.now()+''}; users[u].chats[users[u].curId]=[]; }
-  else if(users[u].pass!==p) return alert('Password salah!');
-  curUser=u; localStorage.setItem('ai_cur_user',u); localStorage.setItem('ai_users',JSON.stringify(users));
-  $('loginPage').style.display='none'; $('uName').textContent='👤 '+u; $('curTop').textContent=u; render(); load();
+
+function exportChat(){
+  const txt=(allChats[cur]||[]).map(m=>`${m.role}: ${m.text}`).join('\n\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt])); a.download='chat.txt'; a.click();
 }
-function logout(){ if(!confirm('Yakin logout? Chat tetap kesimpan kok')) return; curUser=null; localStorage.removeItem('ai_cur_user'); $('loginPage').style.display='flex'; $('chatBox').innerHTML=''; }
-function newChat(){ let id=Date.now()+''; users[curUser].chats[id]=[]; users[curUser].curId=id; save(); render(); load(); }
-function save(){ localStorage.setItem('ai_users',JSON.stringify(users)); }
-function render(){ let L=$('list'); L.innerHTML=''; Object.keys(users[curUser].chats).reverse().forEach(id=>{ let d=document.createElement('div'); d.className='chatItem'; d.textContent=(users[curUser].chats[id][0]?.text||'New Chat').slice(0,30); d.onclick=()=>{ users[curUser].curId=id; save(); render(); load(); if(window.innerWidth<800) toggleSide(); }; L.appendChild(d); }); }
-function load(){ let B=$('chatBox'); B.innerHTML=''; let arr=users[curUser].chats[users[curUser].curId]||[]; arr.forEach(m=>{ let div=document.createElement('div'); div.className='bubble '+(m.role=='user'?'user':'ai'); let h=''; if(m.image) h+=`<img src="${m.image}">`; h+=(m.text||'').replace(/\n/g,'<br>'); div.innerHTML=h; B.appendChild(div); }); B.scrollTop=B.scrollHeight; }
-$('fileInp').onchange=e=>{ let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=ev=>{ pend={name:f.name,mime:f.type,data:ev.target.result,[STRIPPED] $('preview').style.display='block'; $('preview').innerHTML=`📎 ${f.name} <span onclick="clearF()" style="margin-left:12px;cursor:pointer">✕</span>`; }; r.readAsDataURL(f); }
-function clearF(){ pend=null; $('preview').style.display='none'; $('fileInp').value=''; }
-async function send(){
-  let txt=$('msgInp').value.trim(); if(!txt &&!pend) return;
-  if(keys.length==0){ openApi(); return; }
-  let curId=users[curUser].curId; let um={role:'user',text:txt}; if(pend){ um.text+=(txt?'\n':'')+`📎 ${pend.name}`; um.image=pend.data; }
-  users[curUser].chats[curId].push(um); let fs=pend; $('msgInp').value=''; clearF(); load(); save(); render();
-  try{
-    let parts=[]; if(txt) parts.push({text:txt}); if(fs) parts.push({inlineData:{mimeType:fs.mime,data:fs.data.split(',[STRIPPED] if(!txt) parts.unshift({text:"Jelaskan gambar ini"});
-    let res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${keys[0]}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
-    let j=await res.json(); let rep=j.candidates?.[0]?.content?.parts?.[0]?.text||j.error?.message||'Error';
-    users[curUser].chats[curId].push({role:'ai',text:rep}); save(); load();
-  }catch(e){ users[curUser].chats[curId].push({role:'ai',text:'Error '+e.message}); save(); load(); }
-}
-init();
+
+renderList(); load();
 </script>
 </body>
-</html>
+  </html>
